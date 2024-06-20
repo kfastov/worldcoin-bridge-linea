@@ -1,4 +1,4 @@
-# Worldcoin State Bridge for Linea
+# World ID State Bridge for Linea
 
 
 ## Description
