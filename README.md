@@ -12,8 +12,6 @@ The addresses of the contract deployments for production and staging will be ava
 
 ## Usage
 
-## Usage
-
 This is a list of the most frequently needed commands.
 
 ### Build
