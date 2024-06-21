@@ -1,0 +1,3 @@
+@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/
+forge-std/=node_modules/forge-std/
+world-id-state-bridge=node_modules/@worldcoin/world-id-state-bridge/src
