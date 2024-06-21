@@ -112,5 +112,7 @@ We welcome contributions to improve and expand the functionality of the Worldcoi
 
 ## Credits
 
+This repo uses code from the Worldcoin State Bridge for Polygon and Optimism, which can be found [here](https://github.com/worldcoin/world-id-state-bridge).
+
 This repo uses Paul Razvan Berg's [foundry template](https://github.com/paulrberg/foundry-template/): A Foundry-based
 template for developing Solidity smart contracts, with sensible defaults.
