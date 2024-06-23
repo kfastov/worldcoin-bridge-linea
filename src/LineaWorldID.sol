@@ -3,7 +3,7 @@ pragma solidity ^0.8.15;
 
 import {WorldIDBridge} from "world-id-state-bridge/abstract/WorldIDBridge.sol";
 
-import {IOpWorldID} from "world-id-state-bridge/interfaces/IOpWorldID.sol";
+import {ILinearWorldID} from "./interfaces/ILineaWorldID.sol";
 import {CrossDomainOwnable3} from
     "@eth-optimism/contracts-bedrock/contracts/L2/CrossDomainOwnable3.sol";
 

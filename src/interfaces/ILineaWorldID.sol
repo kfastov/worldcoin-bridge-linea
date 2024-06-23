@@ -2,8 +2,8 @@
 pragma solidity ^0.8.15;
 
 /// @title Interface for the LineaWorldID contract
-/// @author Worldcoin
-/// @notice Interface for the CrossDomainOwnable contract for the Optimism L2
+/// @author Worldcoin and James Harrison.
+/// @notice Interface for the CrossDomainOwnable contract for the Linea L2
 /// @custom:usage abi.encodeCall(ILineaWorldID.receiveRoot, (_newRoot, _supersedeTimestamp));
 interface ILineaWorldID {
     ////////////////////////////////////////////////////////////////////////////////
