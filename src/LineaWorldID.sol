@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {WorldIDBridge} from "world-id-state-bridge/abstract/WorldIDBridge.sol";
+import { WorldIDBridge } from "world-id-state-bridge/abstract/WorldIDBridge.sol";
 
-import {IOpWorldID} from "world-id-state-bridge/interfaces/IOpWorldID.sol";
-import {CrossDomainOwnable3} from
-    "@eth-optimism/contracts-bedrock/contracts/L2/CrossDomainOwnable3.sol";
+import { IOpWorldID } from "world-id-state-bridge/interfaces/IOpWorldID.sol";
+import { CrossDomainOwnable3 } from "@eth-optimism/contracts-bedrock/contracts/L2/CrossDomainOwnable3.sol";
 
 /// @title Linea World ID Bridge
 /// @author Worldcoin
@@ -21,7 +20,7 @@ contract LineaWorldID is WorldIDBridge, CrossDomainOwnable3, IOpWorldID {
     /// @notice Initializes the contract the depth of the associated merkle tree.
     ///
     /// @param _treeDepth The depth of the WorldID Semaphore merkle tree.
-    constructor(uint8 _treeDepth) WorldIDBridge(_treeDepth) {}
+    constructor(uint8 _treeDepth) WorldIDBridge(_treeDepth) { }
 
     ///////////////////////////////////////////////////////////////////////////////
     ///                               ROOT MIRRORING                            ///
