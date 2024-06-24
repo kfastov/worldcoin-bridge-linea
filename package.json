@@ -7,9 +7,9 @@
     "url": "https://github.com/PaulRBerg"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.1",
+    "@openzeppelin/contracts": "^4.9.6",
     "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge",
-    "openzeppelin-solidity": "github:OpenZeppelin/openzeppelin-contracts"
+    "@rari-capital/solmate": "https://github.com/rari-capital/solmate.git#8f9b23f8838670afda0fd8983f2c41e8037ae6bc"
   },
   "devDependencies": {
     "forge-std": "github:foundry-rs/forge-std#v1.8.1",
