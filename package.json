@@ -1,11 +1,17 @@
 {
-  "name": "@prb/foundry-template",
-  "description": "Foundry-based template for developing Solidity smart contracts",
+  "name": "@kfastov/worldcoin-bridge-linea",
+  "description": "World ID state bridge for Linea",
   "version": "1.0.0",
   "author": {
-    "name": "Paul Razvan Berg",
-    "url": "https://github.com/PaulRBerg"
+    "name": "Konstantin Fastov",
+    "url": "https://github.com/kfastov"
   },
+  "contributors": [
+    {
+      "name": "Worldcoin",
+      "url": "https://github.com/worldcoin"
+    }
+  ],
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.6",
     "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge",
@@ -19,11 +25,13 @@
   "keywords": [
     "blockchain",
     "ethereum",
+    "linea",
+    "worldcoin",
+    "world-id",
     "forge",
     "foundry",
     "smart-contracts",
-    "solidity",
-    "template"
+    "solidity"
   ],
   "private": true,
   "scripts": {
