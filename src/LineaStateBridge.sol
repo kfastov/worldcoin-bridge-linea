@@ -2,12 +2,12 @@
 pragma solidity ^0.8.15;
 
 // Linea interface for cross domain messaging
-import {IMessageService} from  "./interfaces/IMessageService.sol";
-import {ILineaWorldID} from "./interfaces/ILineaWorldID.sol";
-import {IRootHistory} from "world-id-state-bridge/interfaces/IRootHistory.sol";
-import {IWorldIDIdentityManager} from "world-id-state-bridge/interfaces/IWorldIDIdentityManager.sol";
-import {Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
-import {ICrossDomainOwnable3} from "world-id-state-bridge/interfaces/ICrossDomainOwnable3.sol";
+import { IMessageService } from "./interfaces/IMessageService.sol";
+import { ILineaWorldID } from "./interfaces/ILineaWorldID.sol";
+import { IRootHistory } from "world-id-state-bridge/interfaces/IRootHistory.sol";
+import { IWorldIDIdentityManager } from "world-id-state-bridge/interfaces/IWorldIDIdentityManager.sol";
+import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
+import { ICrossDomainOwnable3 } from "world-id-state-bridge/interfaces/ICrossDomainOwnable3.sol";
 
 /// @title World ID State Bridge Linea
 /// @author Worldcoin & James Harrison
@@ -37,7 +37,7 @@ contract LineaStateBridge is Ownable2Step {
     uint32 internal _gasLimitTransferOwnership;
 
     /// @notice The default gas limit amount to buy on an Linea stack chain to do simple transactions
-    uint32 public constant DEFAULT_LINEA_GAS_LIMIT = 1000000;
+    uint32 public constant DEFAULT_LINEA_GAS_LIMIT = 1_000_000;
 
     ///////////////////////////////////////////////////////////////////
     ///                            EVENTS                           ///
@@ -49,9 +49,7 @@ contract LineaStateBridge is Ownable2Step {
     /// @param newOwner The new owner of the LineaWorldID contract
     /// @param isLocal Whether the ownership transfer is local (Linea/Linea Stack chain EOA/contract)
     /// or an Ethereum EOA or contract
-    event OwnershipTransferredLinea(
-        address indexed previousOwner, address indexed newOwner, bool isLocal
-    );
+    event OwnershipTransferredLinea(address indexed previousOwner, address indexed newOwner, bool isLocal);
 
     /// @notice Emitted when the StateBridge sends a root to the LineaWorldID contract
     /// @param root The root sent to the LineaWorldID contract on the Linea Stack chain
@@ -96,11 +94,7 @@ contract LineaStateBridge is Ownable2Step {
     /// @param _crossDomainMessenger L1CrossDomainMessenger contract used to communicate with the desired Linea
     /// Stack network
     /// @custom:revert if any of the constructor params addresses are zero
-    constructor(
-        address _worldIDIdentityManager,
-        address _lineaWorldIDAddress,
-        address _crossDomainMessenger
-    ) {
+    constructor(address _worldIDIdentityManager, address _lineaWorldIDAddress, address _crossDomainMessenger) {
         if (
             _worldIDIdentityManager == address(0) || _lineaWorldIDAddress == address(0)
                 || _crossDomainMessenger == address(0)
@@ -131,7 +125,10 @@ contract LineaStateBridge is Ownable2Step {
 
         IMessageService(crossDomainMessengerAddress).sendMessage(
             // Contract address on the OP Stack Chain
-            lineaWorldIDAddress, _gasLimitPropagateRoot, message );
+            lineaWorldIDAddress,
+            _gasLimitPropagateRoot,
+            message
+        );
 
         emit RootPropagated(latestRoot);
     }
@@ -148,8 +145,7 @@ contract LineaStateBridge is Ownable2Step {
 
         // The `encodeCall` function is strongly typed, so this checks that we are passing the
         // correct data to the OP Stack chain bridge.
-        bytes memory message =
-            abi.encodeCall(ICrossDomainOwnable3.transferOwnership, (_owner, _isLocal));
+        bytes memory message = abi.encodeCall(ICrossDomainOwnable3.transferOwnership, (_owner, _isLocal));
 
         IMessageService(crossDomainMessengerAddress).sendMessage(
             // Contract address on the Linea Stack Chain
@@ -166,8 +162,7 @@ contract LineaStateBridge is Ownable2Step {
     function setRootHistoryExpiry(uint256 _rootHistoryExpiry) external onlyOwner {
         // The `encodeCall` function is strongly typed, so this checks that we are passing the
         // correct data to the optimism bridge.
-        bytes memory message =
-            abi.encodeCall(IRootHistory.setRootHistoryExpiry, (_rootHistoryExpiry));
+        bytes memory message = abi.encodeCall(IRootHistory.setRootHistoryExpiry, (_rootHistoryExpiry));
 
         IMessageService(crossDomainMessengerAddress).sendMessage(
             // Contract address on the OP Stack Chain
