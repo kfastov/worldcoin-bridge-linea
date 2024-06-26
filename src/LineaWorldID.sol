@@ -12,7 +12,7 @@ import { CrossDomainOwnable3 } from "@eth-optimism/contracts-bedrock/contracts/L
 ///         Linea.
 /// @dev This contract is deployed on Linea and is called by the L1 Proxy contract for each new
 ///      root insertion.
-contract LineaWorldID is WorldIDBridge, CrossDomainOwnable3, IOpWorldID {
+contract LineaWorldID is WorldIDBridge, CrossDomainOwnable3, ILineaWorldID {
     ///////////////////////////////////////////////////////////////////////////////
     ///                                CONSTRUCTION                             ///
     ///////////////////////////////////////////////////////////////////////////////
