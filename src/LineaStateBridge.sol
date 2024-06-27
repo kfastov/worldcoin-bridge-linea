@@ -15,36 +15,46 @@ contract LineaStateBridge is Ownable2Step {
 
     // TODO: implement contract logic
     ///////////////////////////////////////////////////////////////////
-///                         Linea GAS LIMIT                     ///
-///////////////////////////////////////////////////////////////////
+    ///                         Linea GAS LIMIT                     ///
+    ///////////////////////////////////////////////////////////////////
 
-/// @notice Sets the gas limit for the propagateRoot method
-/// @param _lineaGasLimit The new gas limit for the propagateRoot method
-function setGasLimitPropagateRoot(uint32 _lineaGasLimit) external onlyOwner {
-    if (_lineaGasLimit <= 0) {
-        revert GasLimitZero();
-    }
-    gasLimitPropagateRoot = _lineaGasLimit;
-    emit SetGasLimitPropagateRoot(_lineaGasLimit);
-}
+    error GasLimitZero();
 
-/// @notice Sets the gas limit for the setRootHistoryExpiry method
-/// @param _lineaGasLimit The new gas limit for the setRootHistoryExpiry method
-function setGasLimitSetRootHistoryExpiry(uint32 _lineaGasLimit) external onlyOwner {
-    if (_lineaGasLimit <= 0) {
-        revert GasLimitZero();
-    }
-    gasLimitSetRootHistoryExpiry = _lineaGasLimit;
-    emit SetGasLimitSetRootHistoryExpiry(_lineaGasLimit);
-}
+    uint32 public gasLimitPropagateRoot;
+    uint32 public gasLimitSetRootHistoryExpiry;
+    uint32 public gasLimitTransferOwnership;
 
-/// @notice Sets the gas limit for the transferOwnership method
-/// @param _lineaGasLimit The new gas limit for the transferOwnership method
-function setGasLimitTransferOwnership(uint32 _lineaGasLimit) external onlyOwner {
-    if (_lineaGasLimit <= 0) {
-        revert GasLimitZero();
+    event SetGasLimitPropagateRoot(uint32 newGasLimit);
+    event SetGasLimitSetRootHistoryExpiry(uint32 newGasLimit);
+    event SetGasLimitTransferOwnership(uint32 newGasLimit);
+
+    /// @notice Sets the gas limit for the propagateRoot method
+    /// @param _lineaGasLimit The new gas limit for the propagateRoot method
+    function setGasLimitPropagateRoot(uint32 _lineaGasLimit) external onlyOwner {
+        if (_lineaGasLimit <= 0) {
+            revert GasLimitZero();
+        }
+        gasLimitPropagateRoot = _lineaGasLimit;
+        emit SetGasLimitPropagateRoot(_lineaGasLimit);
     }
-    gasLimitTransferOwnership = _lineaGasLimit;
-    emit SetGasLimitTransferOwnership(_lineaGasLimit);
-}
+
+    /// @notice Sets the gas limit for the setRootHistoryExpiry method
+    /// @param _lineaGasLimit The new gas limit for the setRootHistoryExpiry method
+    function setGasLimitSetRootHistoryExpiry(uint32 _lineaGasLimit) external onlyOwner {
+        if (_lineaGasLimit <= 0) {
+            revert GasLimitZero();
+        }
+        gasLimitSetRootHistoryExpiry = _lineaGasLimit;
+        emit SetGasLimitSetRootHistoryExpiry(_lineaGasLimit);
+    }
+
+    /// @notice Sets the gas limit for the transferOwnership method
+    /// @param _lineaGasLimit The new gas limit for the transferOwnership method
+    function setGasLimitTransferOwnership(uint32 _lineaGasLimit) external onlyOwner {
+        if (_lineaGasLimit <= 0) {
+            revert GasLimitZero();
+        }
+        gasLimitTransferOwnership = _lineaGasLimit;
+        emit SetGasLimitTransferOwnership(_lineaGasLimit);
+    }
 }
