@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
+import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
+
 // Optimism interface for cross domain messaging
 
 /// @title World ID State Bridge Optimism
