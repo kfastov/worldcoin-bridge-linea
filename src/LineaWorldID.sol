@@ -58,11 +58,4 @@ contract LineaWorldID is WorldIDBridge, MessageServiceBase, ILineaWorldID {
         _setRootHistoryExpiry(expiryTime);
     }
 
-    /// @notice Updates messageService and remoteSender addresses
-    ///
-    /// @param _messageService messageService address
-    /// @param _remoteSender remoteSender address
-    function updateMessageServiceBase(address _messageService, address _remoteSender) public virtual onlyMessagingService() onlyAuthorizedRemoteSender(){
-        _init_MessageServiceBase(_messageService, _remoteSender);
-    }
 }
