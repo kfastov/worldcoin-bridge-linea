@@ -8,7 +8,6 @@ import { ILineaWorldID } from "./interfaces/ILineaWorldID.sol";
 import { IRootHistory } from "world-id-state-bridge/interfaces/IRootHistory.sol";
 import { IWorldIDIdentityManager } from "world-id-state-bridge/interfaces/IWorldIDIdentityManager.sol";
 import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
-import { ICrossDomainOwnable3 } from "world-id-state-bridge/interfaces/ICrossDomainOwnable3.sol";
 
 /// @title World ID State Bridge Linea
 /// @author Worldcoin & James Harrison
@@ -34,7 +33,7 @@ contract LineaStateBridge is Ownable2Step {
     /// @notice Amount of gas purchased on the OLinea Stack chain for SetRootHistoryExpiry
     uint32 internal _gasLimitSetRootHistoryExpiry;
 
-    /// @notice Amount of gas purchased on the Linea Stack chain for transferOwnershipOp
+    /// @notice Amount of gas purchased on the Linea Stack chain for transferOwnershipLinea
     uint32 internal _gasLimitTransferOwnership;
 
     /// @notice The default gas limit amount to buy on an Linea stack chain to do simple transactions
@@ -43,35 +42,36 @@ contract LineaStateBridge is Ownable2Step {
     ///////////////////////////////////////////////////////////////////
     ///                            EVENTS                           ///
     ///////////////////////////////////////////////////////////////////
+    /// @notice Emitted when the StateBridge gives ownership of the LineaWorldID contract
+    /// to the WorldID Identity Manager contract away
+    /// @param previousOwner The previous owner of the LineaWorldID contract
+    /// @param remoteAddress The authorized remote sender address, cannot be empty
+    event UpdatedRemoteAddressLinea(address indexed previousOwner, address indexed remoteAddress);
 
     /// @notice Emitted when the StateBridge gives ownership of the LineaWorldID contract
     /// to the WorldID Identity Manager contract away
     /// @param previousOwner The previous owner of the LineaWorldID contract
-    /// @param messageService The new owner of the LineaWorldID contract
-    /// @param remoteAddress Whether the ownership transfer is local (Linea/Linea Stack chain EOA/contract)
-    /// or an Ethereum EOA or contract
-    event OwnershipTransferredLinea(
-        address indexed previousOwner, address indexed messageService, address remoteAddress
-    );
+    /// @param messageService The message service address, cannot be empty.
+    event UpdatedMessageServiceLinea(address indexed previousOwner, address indexed messageService);
 
     /// @notice Emitted when the StateBridge sends a root to the LineaWorldID contract
     /// @param root The root sent to the LineaWorldID contract on the Linea Stack chain
     event RootPropagated(uint256 root);
 
-    /// @notice Emitted when the StateBridge sets the root history expiry for OpWorldID, LineaWorldID and PolygonWorldID
+    /// @notice Emitted when the StateBridge sets the root history expiry for LineaWorldID
     /// @param rootHistoryExpiry The new root history expiry
     event SetRootHistoryExpiry(uint256 rootHistoryExpiry);
 
-    /// @notice Emitted when the StateBridge sets the gas limit for sendRootOp
-    /// @param _lineaGasLimit The new _lineaGasLimit  for sendRootOp
+    /// @notice Emitted when the StateBridge sets the gas limit for sendRootLinea
+    /// @param _lineaGasLimit The new _lineaGasLimit  for sendRootLinea
     event SetGasLimitPropagateRoot(uint32 _lineaGasLimit);
 
     /// @notice Emitted when the StateBridge sets the gas limit for SetRootHistoryExpiry
     /// @param _lineaGasLimit The new _lineaGasLimit  for SetRootHistoryExpiry
     event SetGasLimitSetRootHistoryExpiry(uint32 _lineaGasLimit);
 
-    /// @notice Emitted when the StateBridge sets the gas limit for transferOwnershipOp
-    /// @param _lineaGasLimit The new _lineaGasLimit  for transferOwnershipOptimism
+    /// @notice Emitted when the StateBridge sets the gas limit for transferOwnershipLinea
+    /// @param _lineaGasLimit The new _lineaGasLimit  for transferOwnershipLinea
     event SetGasLimitTransferOwnershipLinea(uint32 _lineaGasLimit);
 
     ///////////////////////////////////////////////////////////////////
@@ -94,20 +94,19 @@ contract LineaStateBridge is Ownable2Step {
     /// @notice constructor
     /// @param _worldIDIdentityManager Deployment address of the WorldID Identity Manager contract
     /// @param _lineaWorldIDAddress Address of the Linea contract that will receive the new root and timestamp
-    /// @param _crossDomainMessenger L1CrossDomainMessenger contract used to communicate with the desired Linea
+    /// @param _messageService L1CrossDomainMessenger contract used to communicate with the desired Linea
     /// Stack network
     /// @custom:revert if any of the constructor params addresses are zero
-    constructor(address _worldIDIdentityManager, address _lineaWorldIDAddress, address _crossDomainMessenger) {
+    constructor(address _worldIDIdentityManager, address _lineaWorldIDAddress, address _messageService) {
         if (
-            _worldIDIdentityManager == address(0) || _lineaWorldIDAddress == address(0)
-                || _crossDomainMessenger == address(0)
+            _worldIDIdentityManager == address(0) || _lineaWorldIDAddress == address(0) || _messageService == address(0)
         ) {
             revert AddressZero();
         }
 
         lineaWorldIDAddress = _lineaWorldIDAddress;
         worldIDAddress = _worldIDIdentityManager;
-        crossDomainMessengerAddress = _crossDomainMessenger;
+        crossDomainMessengerAddress = _messageService;
         _gasLimitPropagateRoot = DEFAULT_LINEA_GAS_LIMIT;
         _gasLimitSetRootHistoryExpiry = DEFAULT_LINEA_GAS_LIMIT;
         _gasLimitTransferOwnership = DEFAULT_LINEA_GAS_LIMIT;
@@ -123,7 +122,7 @@ contract LineaStateBridge is Ownable2Step {
         uint256 latestRoot = IWorldIDIdentityManager(worldIDAddress).latestRoot();
 
         // The `encodeCall` function is strongly typed, so this checks that we are passing the
-        // correct data to the optimism bridge.
+        // correct data to the Linea messaging service.
         bytes memory message = abi.encodeCall(ILineaWorldID.receiveRoot, (latestRoot));
 
         IMessageService(crossDomainMessengerAddress).sendMessage(
@@ -141,26 +140,7 @@ contract LineaStateBridge is Ownable2Step {
     /// @dev  _messageService should be hardcoded to 0x508Ca82Df566dCD1B0DE8296e70a96332cD644ec for L2 Linea
     /// @dev _remoteSender should be address of L1 LineaStateBridge
     /// @custom:revert if _owner is set to the zero address
-    // function transferOwnershipLineas(address _messageService, address _remoteSender) external onlyOwner {
-    //     if (_remoteSender == address(0) || _messageService == address(0)) {
-    //         revert AddressZero();
-    //     }
-
-    //     // The `encodeCall` function is strongly typed, so this checks that we are passing the
-    //     // correct data to the Linea Stack chain bridge.
-    //     bytes memory message =
-    //         abi.encodeCall(MessageServiceBase.updateMessageServiceBase(_messageService, _remoteSender));
-
-    //     IMessageService(crossDomainMessengerAddress).sendMessage(
-    //         // Contract address on the Linea Stack Chain
-    //         lineaWorldIDAddress,
-    //         _gasLimitTransferOwnership,
-    //         message
-    //     );
-
-    //     emit OwnershipTransferredLinea(owner(), _messageService, _remoteSender);
-    // }
-    function transferOwnershipLineas(address _messageService, address _remoteSender) external onlyOwner {
+    function transferOwnershipLinea(address _messageService, address _remoteSender) external onlyOwner {
         if (_remoteSender == address(0) || _messageService == address(0)) {
             revert AddressZero();
         }
@@ -177,18 +157,19 @@ contract LineaStateBridge is Ownable2Step {
             message
         );
 
-        emit OwnershipTransferredLinea(owner(), _messageService, _remoteSender);
+        emit UpdatedRemoteAddressLinea(owner(), _remoteSender);
+        emit UpdatedMessageServiceLinea(owner(), _messageService);
     }
 
     /// @notice Adds functionality to the StateBridge to set the root history expiry on LineaWorldID
     /// @param _rootHistoryExpiry new root history expiry
     function setRootHistoryExpiry(uint256 _rootHistoryExpiry) external onlyOwner {
         // The `encodeCall` function is strongly typed, so this checks that we are passing the
-        // correct data to the optimism bridge.
+        // correct data to the linea bridge.
         bytes memory message = abi.encodeCall(IRootHistory.setRootHistoryExpiry, (_rootHistoryExpiry));
 
         IMessageService(crossDomainMessengerAddress).sendMessage(
-            // Contract address on the OP Stack Chain
+            // Contract address on the Linea Stack Chain
             lineaWorldIDAddress,
             _gasLimitSetRootHistoryExpiry,
             message
@@ -225,8 +206,8 @@ contract LineaStateBridge is Ownable2Step {
         emit SetGasLimitSetRootHistoryExpiry(_lineaGasLimit);
     }
 
-    /// @notice Sets the gas limit for the transferOwnershipOp method
-    /// @param _lineaGasLimit The new gas limit for the transferOwnershipOp method
+    /// @notice Sets the gas limit for the transferOwnershipLinea method
+    /// @param _lineaGasLimit The new gas limit for the transferOwnershipLinea method
     function setGasLimitTransferOwnershipOp(uint32 _lineaGasLimit) external onlyOwner {
         if (_lineaGasLimit <= 0) {
             revert GasLimitZero();
