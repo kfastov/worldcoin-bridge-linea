@@ -1,9 +1,4 @@
 pragma solidity ^0.8.15;
-
-/// @title Canonical Message Serivice for Linea
-/// @author Linea
-/// @notice The message service is responsible for cross-chain messages between Ethereum and Linea,
-///
 interface IMessageService {
     /**
      * @dev Emitted when a message is sent.
