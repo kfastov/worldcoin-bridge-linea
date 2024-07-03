@@ -21,8 +21,8 @@ contract LineaStateBridge is Ownable2Step {
     /// @notice The address of the LinearWorldID contract on any Linea Stack chain
     address public immutable lineaWorldIDAddress;
 
-    /// @notice address for Linea Stack chain Ethereum mainnet L1CrossDomainMessenger contract
-    address internal immutable crossDomainMessengerAddress;
+    /// @notice address for Linea Stack chain Ethereum mainnet L1 Message Service contract
+    address internal immutable messageServiceAddress;
 
     /// @notice Ethereum mainnet worldID Address
     address public immutable worldIDAddress;
@@ -42,17 +42,17 @@ contract LineaStateBridge is Ownable2Step {
     ///////////////////////////////////////////////////////////////////
     ///                            EVENTS                           ///
     ///////////////////////////////////////////////////////////////////
-    /// @notice Emitted when the StateBridge gives ownership of the LineaWorldID contract
-    /// to the WorldID Identity Manager contract away
-    /// @param previousOwner The previous owner of the LineaWorldID contract
+    /// @notice Emitted when the StateBridge changes authorized remote sender address
+    /// of the LineaWorldID contract to the WorldID Identity Manager contract
+    /// @param previousRemoteAddress The previous authorized remote sender for the LineaWorldID contract
     /// @param remoteAddress The authorized remote sender address, cannot be empty
-    event UpdatedRemoteAddressLinea(address indexed previousOwner, address indexed remoteAddress);
+    event UpdatedRemoteAddressLinea(address indexed previousRemoteAddress, address indexed remoteAddress);
 
-    /// @notice Emitted when the StateBridge gives ownership of the LineaWorldID contract
-    /// to the WorldID Identity Manager contract away
-    /// @param previousOwner The previous owner of the LineaWorldID contract
+    /// @notice Emitted when the StateBridge changes message service address
+    /// of the LineaWorldID contract
+    /// @param previousMessageService The previous message service address for the LineaWorldID contract
     /// @param messageService The message service address, cannot be empty.
-    event UpdatedMessageServiceLinea(address indexed previousOwner, address indexed messageService);
+    event UpdatedMessageServiceLinea(address indexed previousMessageService, address indexed messageService);
 
     /// @notice Emitted when the StateBridge sends a root to the LineaWorldID contract
     /// @param root The root sent to the LineaWorldID contract on the Linea Stack chain
@@ -94,7 +94,7 @@ contract LineaStateBridge is Ownable2Step {
     /// @notice constructor
     /// @param _worldIDIdentityManager Deployment address of the WorldID Identity Manager contract
     /// @param _lineaWorldIDAddress Address of the Linea contract that will receive the new root and timestamp
-    /// @param _messageService L1CrossDomainMessenger contract used to communicate with the desired Linea
+    /// @param _messageService L1 Message Service contract used to communicate with the desired Linea
     /// Stack network
     /// @custom:revert if any of the constructor params addresses are zero
     constructor(address _worldIDIdentityManager, address _lineaWorldIDAddress, address _messageService) {
@@ -106,7 +106,7 @@ contract LineaStateBridge is Ownable2Step {
 
         lineaWorldIDAddress = _lineaWorldIDAddress;
         worldIDAddress = _worldIDIdentityManager;
-        crossDomainMessengerAddress = _messageService;
+        messageServiceAddress = _messageService;
         _gasLimitPropagateRoot = DEFAULT_LINEA_GAS_LIMIT;
         _gasLimitSetRootHistoryExpiry = DEFAULT_LINEA_GAS_LIMIT;
         _gasLimitTransferOwnership = DEFAULT_LINEA_GAS_LIMIT;
@@ -125,7 +125,7 @@ contract LineaStateBridge is Ownable2Step {
         // correct data to the Linea messaging service.
         bytes memory message = abi.encodeCall(ILineaWorldID.receiveRoot, (latestRoot));
 
-        IMessageService(crossDomainMessengerAddress).sendMessage(
+        IMessageService(messageServiceAddress).sendMessage(
             // Contract address on the Linea Stack Chain
             lineaWorldIDAddress,
             _gasLimitPropagateRoot,
@@ -150,7 +150,7 @@ contract LineaStateBridge is Ownable2Step {
         bytes memory message =
             abi.encodeCall(MessageServiceBase.updateMessageServiceBase, (_messageService, _remoteSender));
 
-        IMessageService(crossDomainMessengerAddress).sendMessage(
+        IMessageService(messageServiceAddress).sendMessage(
             // Contract address on the Linea Stack Chain
             lineaWorldIDAddress,
             _gasLimitTransferOwnership,
@@ -168,7 +168,7 @@ contract LineaStateBridge is Ownable2Step {
         // correct data to the linea bridge.
         bytes memory message = abi.encodeCall(IRootHistory.setRootHistoryExpiry, (_rootHistoryExpiry));
 
-        IMessageService(crossDomainMessengerAddress).sendMessage(
+        IMessageService(messageServiceAddress).sendMessage(
             // Contract address on the Linea Stack Chain
             lineaWorldIDAddress,
             _gasLimitSetRootHistoryExpiry,
