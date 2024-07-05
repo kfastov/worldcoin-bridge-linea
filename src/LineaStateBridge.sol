@@ -37,7 +37,7 @@ contract LineaStateBridge is Ownable2Step {
     uint32 internal _gasLimitTransferOwnership;
 
     /// @notice The default gas limit amount to buy on an Linea stack chain to do simple transactions
-    uint32 public constant DEFAULT_LINEA_GAS_LIMIT = 1_000_000;
+    uint32 public constant DEFAULT_LINEA_GAS_LIMIT = 988_315;
 
     ///////////////////////////////////////////////////////////////////
     ///                            EVENTS                           ///
