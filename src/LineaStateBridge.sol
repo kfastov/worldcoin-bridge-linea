@@ -36,7 +36,8 @@ contract LineaStateBridge is Ownable2Step {
     /// @notice Amount of gas purchased on the Linea Stack chain for transferOwnershipLinea
     uint32 internal _gasLimitTransferOwnership;
 
-    // Approximate gas limit. Will be refined through testnet testing
+    /// @notice The default gas limit amount to buy on an Linea stack chain to do simple transactions
+    /// @dev For estimation see https://github.com/kfastov/worldcoin-bridge-linea/pull/9
     uint32 public constant DEFAULT_LINEA_GAS_LIMIT = 1_000_000;
 
     ///////////////////////////////////////////////////////////////////
