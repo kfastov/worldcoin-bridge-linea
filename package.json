@@ -15,8 +15,8 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.6",
     "@openzeppelin/contracts-upgradeable": "^4.9.6",
-    "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge",
-    "@rari-capital/solmate": "https://github.com/rari-capital/solmate.git#8f9b23f8838670afda0fd8983f2c41e8037ae6bc"
+    "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge#29641f7",
+    "@rari-capital/solmate": "github:rari-capital/solmate#8f9b23f"
   },
   "devDependencies": {
     "forge-std": "github:foundry-rs/forge-std#v1.8.1",
