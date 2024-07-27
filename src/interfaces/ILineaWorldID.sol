@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.15;
+pragma solidity 0.8.19;
 
 /// @title Interface for the LineaWorldID contract
 /// @author Worldcoin and 0xprinc x James Harrison.

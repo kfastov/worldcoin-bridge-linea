@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.15;
+pragma solidity 0.8.19;
 
 // Linea interface for cross domain messaging
 import { IMessageService } from "./interfaces/IMessageService.sol";
