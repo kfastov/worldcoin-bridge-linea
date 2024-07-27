@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: OWNED BY Consensys Software Inc.
-pragma solidity ^0.8.15;
+pragma solidity 0.8.19;
 
 import "./interfaces/IMessageService.sol";
 
