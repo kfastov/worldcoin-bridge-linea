@@ -2,3 +2,4 @@
 @openzeppelin/contracts-upgradeable/=node_modules/@openzeppelin/contracts-upgradeable
 forge-std/=node_modules/forge-std/
 world-id-state-bridge=node_modules/@worldcoin/world-id-state-bridge/src
+linea-contracts/=node_modules/linea-contracts/contracts
