@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import {Script} from "forge-std/src/Script.sol";
-import {LineaWorldID} from "../LineaWorldID.sol";
+import { Script } from "forge-std/src/Script.sol";
+import { LineaWorldID } from "../LineaWorldID.sol";
 
-
-contract DeployLinearWorldID is Script {
+contract DeployLineaWorldID is Script {
     LineaWorldID public lineaWorldId;
 
     address public messageServiceAddress;
@@ -22,13 +21,9 @@ contract DeployLinearWorldID is Script {
     uint256 public privateKey;
 
     function setUp() public {
-
-        messageServiceAddress =
-            abi.decode(vm.parseJson(json, ".messageServiceAddress"), (address));
-        
+        messageServiceAddress = abi.decode(vm.parseJson(json, ".messageServiceAddress"), (address));
         remoteSenderAddress = abi.decode(vm.parseJson(json, ".lineaStateBridgeAddress"), (address));
-
-
+        treeDepth = uint8(30);
     }
 
     function run() external {
@@ -38,5 +33,4 @@ contract DeployLinearWorldID is Script {
         lineaWorldId = new LineaWorldID(treeDepth, messageServiceAddress, remoteSenderAddress);
         vm.stopBroadcast();
     }
-
 }
