@@ -14,22 +14,24 @@ contract DeployLineaWorldID is Script {
     ///                            CONFIG                           ///
     ///////////////////////////////////////////////////////////////////
     string public root = vm.projectRoot();
-    string public path = string.concat(root, "/src/script/.deploy-config.json");
+    string public path = "src/script/.deploy-config.json";
     string public json = vm.readFile(path);
 
     uint8 public treeDepth;
-    uint256 public privateKey;
 
     function setUp() public {
+        // LineaWorldID is not deployed yet, so use the deployer's address as a placeholder
+        address tempAddress = msg.sender;
+
+        remoteSenderAddress = tempAddress;
         messageServiceAddress = abi.decode(vm.parseJson(json, ".messageServiceAddress"), (address));
-        remoteSenderAddress = abi.decode(vm.parseJson(json, ".lineaStateBridgeAddress"), (address));
+        // remoteSenderAddress = abi.decode(vm.parseJson(json, ".lineaStateBridgeAddress"), (address));
         treeDepth = uint8(30);
     }
 
     function run() external {
-        privateKey = abi.decode(vm.parseJson(json, ".privateKey"), (uint256));
+        uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(privateKey);
-
         lineaWorldId = new LineaWorldID(treeDepth, messageServiceAddress, remoteSenderAddress);
         vm.stopBroadcast();
     }
