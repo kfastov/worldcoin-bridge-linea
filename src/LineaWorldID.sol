@@ -2,8 +2,8 @@
 pragma solidity 0.8.19;
 
 import { WorldIDBridge } from "world-id-state-bridge/abstract/WorldIDBridge.sol";
-import { MessageServiceBase } from "./MessageServiceBase.sol";
 import { ILineaWorldID } from "./interfaces/ILineaWorldID.sol";
+import { CrossDomainOwnableLinea } from "./CrossDomainOwnableLinea.sol";
 // import { CrossDomainOwnable3 } from "@eth-optimism/contracts-bedrock/contracts/L2/CrossDomainOwnable3.sol";
 
 /// @title Linea World ID Bridge
@@ -12,22 +12,20 @@ import { ILineaWorldID } from "./interfaces/ILineaWorldID.sol";
 ///         Linea.
 /// @dev This contract is deployed on Linea and is called by the L1 Proxy contract for each new
 ///      root insertion.
-contract LineaWorldID is WorldIDBridge, MessageServiceBase, ILineaWorldID {
+contract LineaWorldID is WorldIDBridge, ILineaWorldID, CrossDomainOwnableLinea {
     ///////////////////////////////////////////////////////////////////////////////
     ///                                CONSTRUCTION                             ///
     ///////////////////////////////////////////////////////////////////////////////
 
     /// @notice Initializes the contract the depth of the associated merkle tree.
     /// @dev  _messageService should be hardcoded to 0x508Ca82Df566dCD1B0DE8296e70a96332cD644ec for L2 Linea
-    /// @dev _remoteSender should be address of L1 LineaStateBridge
     /// @param _treeDepth The depth of the WorldID Semaphore merkle tree.
     constructor(
         uint8 _treeDepth,
-        address _messageService,
-        address _remoteSender
+        address _messageService
     )
         WorldIDBridge(_treeDepth)
-        MessageServiceBase(_messageService, _remoteSender)
+        CrossDomainOwnableLinea(_messageService)
     { }
     ///////////////////////////////////////////////////////////////////////////////
     ///                               ROOT MIRRORING                            ///
@@ -46,7 +44,7 @@ contract LineaWorldID is WorldIDBridge, MessageServiceBase, ILineaWorldID {
     ///
     /// @custom:reverts CannotOverwriteRoot If the root already exists in the root history.
     /// @custom:reverts string If the caller is not the owner.
-    function receiveRoot(uint256 newRoot) external virtual onlyMessagingService onlyAuthorizedRemoteSender {
+    function receiveRoot(uint256 newRoot) external virtual onlyOwner {
         _receiveRoot(newRoot);
     }
 
@@ -59,13 +57,7 @@ contract LineaWorldID is WorldIDBridge, MessageServiceBase, ILineaWorldID {
     /// @param expiryTime The new amount of time it takes for a root to expire.
     ///
     /// @custom:reverts string If the caller is not the owner.
-    function setRootHistoryExpiry(uint256 expiryTime)
-        public
-        virtual
-        override
-        onlyMessagingService
-        onlyAuthorizedRemoteSender
-    {
+    function setRootHistoryExpiry(uint256 expiryTime) public virtual override onlyOwner {
         _setRootHistoryExpiry(expiryTime);
     }
 }

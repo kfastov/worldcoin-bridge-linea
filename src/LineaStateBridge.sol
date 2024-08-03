@@ -8,6 +8,7 @@ import { ILineaWorldID } from "./interfaces/ILineaWorldID.sol";
 import { IRootHistory } from "world-id-state-bridge/interfaces/IRootHistory.sol";
 import { IWorldIDIdentityManager } from "world-id-state-bridge/interfaces/IWorldIDIdentityManager.sol";
 import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
+import { ICrossDomainOwnableLinea } from "./interfaces/ICrossDomainOwnableLinea.sol";
 
 /// @title World ID State Bridge Linea
 /// @author Worldcoin & James Harrison
@@ -136,29 +137,37 @@ contract LineaStateBridge is Ownable2Step {
         emit RootPropagated(latestRoot);
     }
 
-    /// @notice Adds functionality to the StateBridge to transfer ownership
-    /// of LineaWorldID to another contract on L1 or to a local Linea Stack chain EOA
-    /// @dev  _messageService should be hardcoded to 0x508Ca82Df566dCD1B0DE8296e70a96332cD644ec for L2 Linea
-    /// @dev _remoteSender should be address of L1 LineaStateBridge
-    /// @custom:revert if _owner is set to the zero address
-    function transferOwnershipLinea(address _messageService, address _remoteSender) external onlyOwner {
-        if (_remoteSender == address(0) || _messageService == address(0)) {
+    /// @notice Allows for ownership to be transferred with specifying the locality.
+    /// @param _owner   The new owner of the contract.
+    /// @param _isLocal Configures the locality of the ownership.
+
+    function transferOwnership(address _owner, bool _isLocal) external onlyOwner {
+        if (_owner == address(0)) {
             revert AddressZero();
         }
 
-        // The `encodeCall` function is strongly typed, so this checks that we are passing the
-        // correct data to the Linea Stack chain bridge.
-        bytes memory message =
-            abi.encodeCall(MessageServiceBase.updateMessageServiceBase, (_messageService, _remoteSender));
+        // Encoding the call to transferOwnership on ICrossDomainOwnableLinea
+        bytes memory message = abi.encodeCall(ICrossDomainOwnableLinea.transferOwnership, (_owner, _isLocal));
 
-        IMessageService(messageServiceAddress).sendMessage(
-            // Contract address on the Linea Stack Chain
-            lineaWorldIDAddress,
-            _gasLimitTransferOwnership,
-            message
-        );
+        // Sending the message to LineaWorldID via IMessageService
+        IMessageService(messageServiceAddress).sendMessage(lineaWorldIDAddress, _gasLimitTransferOwnership, message);
 
-        emit UpdatedRemoteAddressLinea(owner(), _remoteSender);
+        emit UpdatedRemoteAddressLinea(owner(), _owner);
+    }
+
+    /// @notice Sets or updates the messaging service
+    /// @param _messageService The new message service address, cannot be empty.
+    function setMessagingService(address _messageService) public onlyOwner {
+        if (_messageService == address(0)) {
+            revert AddressZero();
+        }
+
+        // Encoding the call to setMessagingService on ICrossDomainOwnableLinea
+        bytes memory message = abi.encodeCall(ICrossDomainOwnableLinea.setMessagingService, (_messageService));
+
+        // Sending the message to LineaWorldID via IMessageService
+        IMessageService(messageServiceAddress).sendMessage(lineaWorldIDAddress, _gasLimitTransferOwnership, message);
+
         emit UpdatedMessageServiceLinea(owner(), _messageService);
     }
 
