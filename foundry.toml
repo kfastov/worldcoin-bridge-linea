@@ -26,8 +26,8 @@ remappings = [
 ]
 
 [profile.ci]
-  fuzz = {runs = 10_000}
-  verbosity = 4
+fuzz = {runs = 10_000}
+verbosity = 4
 
 [etherscan]
 arbitrum = {key = "${API_KEY_ARBISCAN}"}
