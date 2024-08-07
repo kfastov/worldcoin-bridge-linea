@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {Script} from "forge-std/Script.sol";
-import {MockBridgedWorldID} from "src/mock/MockBridgedWorldID.sol";
+import { Script } from "forge-std/Script.sol";
+import { MockBridgedWorldID } from "src/mock/MockBridgedWorldID.sol";
 
 /// @title MockBridgedWorldID deployment script
 /// @notice forge script to deploy MockBridgedWorldID.sol

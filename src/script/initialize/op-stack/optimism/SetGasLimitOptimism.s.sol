@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {Script} from "forge-std/Script.sol";
-import {OpStateBridge} from "src/OpStateBridge.sol";
+import { Script } from "forge-std/Script.sol";
+import { OpStateBridge } from "src/OpStateBridge.sol";
 
 /// @title Optimism State Bridge Gas Limit setter
 /// @notice forge script to set the correct gas limits for crossDomainMessenger calls to Optimism for the StateBridge
@@ -25,16 +25,14 @@ contract SetOpGasLimitOptimism is Script {
     ///////////////////////////////////////////////////////////////////
     ///                        OP GAS LIMITS                        ///
     ///////////////////////////////////////////////////////////////////
-    uint32 public gasLimitSendRootOptimism =
-        abi.decode(vm.parseJson(json, ".gasLimitSendRootOptimism"), (uint32));
+    uint32 public gasLimitSendRootOptimism = abi.decode(vm.parseJson(json, ".gasLimitSendRootOptimism"), (uint32));
     uint32 public gasLimitSetRootHistoryExpiryOptimism =
         abi.decode(vm.parseJson(json, ".gasLimitSetRootHistoryExpiryOptimism"), (uint32));
     uint32 public gasLimitTransferOwnershipOptimism =
         abi.decode(vm.parseJson(json, ".gasLimitTransferOwnershipOptimism"), (uint32));
 
     function setUp() public {
-        optimismStateBridgeAddress =
-            abi.decode(vm.parseJson(json, ".optimismStateBridgeAddress"), (address));
+        optimismStateBridgeAddress = abi.decode(vm.parseJson(json, ".optimismStateBridgeAddress"), (address));
 
         optimismStateBridge = OpStateBridge(optimismStateBridgeAddress);
     }

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {Script} from "forge-std/Script.sol";
-import {PolygonWorldID} from "src/PolygonWorldID.sol";
+import { Script } from "forge-std/Script.sol";
+import { PolygonWorldID } from "src/PolygonWorldID.sol";
 
 /// @title PolygonWorldID deployment script on Polygon Mumbai
 /// @notice forge script to deploy PolygonWorldID.sol

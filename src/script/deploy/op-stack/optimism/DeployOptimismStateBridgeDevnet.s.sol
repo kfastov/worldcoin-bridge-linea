@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {Script} from "forge-std/Script.sol";
-import {OpStateBridge} from "src/OpStateBridge.sol";
+import { Script } from "forge-std/Script.sol";
+import { OpStateBridge } from "src/OpStateBridge.sol";
 
 /// @title Deploy State Bridge Optimism
 /// @notice forge script to deploy OpStateBridge.sol on Ethereum mainnet
@@ -32,19 +32,14 @@ contract DeployOpStateBridgeDevnet is Script {
         ///////////////////////////////////////////////////////////////////
         ///                           WORLD ID                          ///
         ///////////////////////////////////////////////////////////////////
-        worldIDIdentityManagerAddress =
-            abi.decode(vm.parseJson(json, ".worldIDIdentityManagerAddress"), (address));
+        worldIDIdentityManagerAddress = abi.decode(vm.parseJson(json, ".worldIDIdentityManagerAddress"), (address));
         opWorldIDAddress = abi.decode(vm.parseJson(json, ".optimismWorldIDAddress"), (address));
     }
 
     function run() public {
         vm.startBroadcast(privateKey);
 
-        bridge = new OpStateBridge (
-            worldIDIdentityManagerAddress,
-            opWorldIDAddress,
-            opCrossDomainMessengerAddress
-        );
+        bridge = new OpStateBridge(worldIDIdentityManagerAddress, opWorldIDAddress, opCrossDomainMessengerAddress);
 
         vm.stopBroadcast();
     }

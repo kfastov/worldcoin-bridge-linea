@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {Script} from "forge-std/Script.sol";
-import {MockWorldIDIdentityManager} from "src/mock/MockWorldIDIdentityManager.sol";
-import {MockBridgedWorldID} from "src/mock/MockBridgedWorldID.sol";
-import {MockStateBridge} from "src/mock/MockStateBridge.sol";
+import { Script } from "forge-std/Script.sol";
+import { MockWorldIDIdentityManager } from "src/mock/MockWorldIDIdentityManager.sol";
+import { MockBridgedWorldID } from "src/mock/MockBridgedWorldID.sol";
+import { MockStateBridge } from "src/mock/MockStateBridge.sol";
 
 /// @title Mock State Bridge deployment script
 /// @notice forge script to deploy MockStateBridge.sol
@@ -30,7 +30,7 @@ contract DeployMockStateBridge is Script {
 
     uint256 public privateKey = abi.decode(vm.parseJson(json, ".privateKey"), (uint256));
 
-    function setUp() public {}
+    function setUp() public { }
 
     function run() public {
         vm.startBroadcast(privateKey);

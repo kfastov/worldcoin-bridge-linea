@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {Script} from "forge-std/Script.sol";
-import {OpWorldID} from "src/OpWorldID.sol";
-import {ICrossDomainOwnable3} from "src/interfaces/ICrossDomainOwnable3.sol";
-import {IOpStateBridgeTransferOwnership} from "src/interfaces/IOpStateBridgeTransferOwnership.sol";
-import {OpStateBridge} from "src/OpStateBridge.sol";
+import { Script } from "forge-std/Script.sol";
+import { OpWorldID } from "src/OpWorldID.sol";
+import { ICrossDomainOwnable3 } from "src/interfaces/ICrossDomainOwnable3.sol";
+import { IOpStateBridgeTransferOwnership } from "src/interfaces/IOpStateBridgeTransferOwnership.sol";
+import { OpStateBridge } from "src/OpStateBridge.sol";
 
 /// @title Ownership Transfer of OpWorldID on Base script
 /// @notice forge script for transferring ownership of OpWorldID to a local (Base)
@@ -32,12 +32,11 @@ contract CrossTransferOwnershipOfBaseWorldID is Script {
         string memory json = vm.readFile(path);
 
         privateKey = abi.decode(vm.parseJson(json, ".privateKey"), (uint256));
-        baseStateBridgeAddress =
-            abi.decode(vm.parseJson(json, ".baseStateBridgeAddress"), (address));
+        baseStateBridgeAddress = abi.decode(vm.parseJson(json, ".baseStateBridgeAddress"), (address));
         newOwner = abi.decode(vm.parseJson(json, ".newBaseWorldIDOwner"), (address));
     }
 
-    constructor() {}
+    constructor() { }
 
     function run() public {
         /// @notice cross domain ownership flag
@@ -47,8 +46,7 @@ contract CrossTransferOwnershipOfBaseWorldID is Script {
 
         vm.startBroadcast(privateKey);
 
-        bytes memory call =
-            abi.encodeCall(IOpStateBridgeTransferOwnership.transferOwnershipOp, (newOwner, isLocal));
+        bytes memory call = abi.encodeCall(IOpStateBridgeTransferOwnership.transferOwnershipOp, (newOwner, isLocal));
 
         (bool ok,) = baseStateBridgeAddress.call(call);
 

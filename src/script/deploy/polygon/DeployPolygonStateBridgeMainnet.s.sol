@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {Script} from "forge-std/Script.sol";
-import {PolygonStateBridge} from "src/PolygonStateBridge.sol";
+import { Script } from "forge-std/Script.sol";
+import { PolygonStateBridge } from "src/PolygonStateBridge.sol";
 
 /// @title Deploy PolygonStateBridge on Mainnet
 /// @notice forge script to deploy PolygonStateBridge.sol
@@ -39,19 +39,14 @@ contract DeployPolygonStateBridgeMainnet is Script {
         ///////////////////////////////////////////////////////////////////
         ///                           WORLD ID                          ///
         ///////////////////////////////////////////////////////////////////
-        worldIDIdentityManagerAddress =
-            abi.decode(vm.parseJson(json, ".worldIDIdentityManagerAddress"), (address));
+        worldIDIdentityManagerAddress = abi.decode(vm.parseJson(json, ".worldIDIdentityManagerAddress"), (address));
         polygonWorldIDAddress = abi.decode(vm.parseJson(json, ".polygonWorldIDAddress"), (address));
     }
 
     function run() public {
         vm.startBroadcast(privateKey);
 
-        bridge = new PolygonStateBridge(
-            checkpointManagerAddress,
-            fxRootAddress,
-            worldIDIdentityManagerAddress
-        );
+        bridge = new PolygonStateBridge(checkpointManagerAddress, fxRootAddress, worldIDIdentityManagerAddress);
 
         bridge.setFxChildTunnel(polygonWorldIDAddress);
 

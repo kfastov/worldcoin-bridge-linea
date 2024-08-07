@@ -3,8 +3,8 @@ pragma solidity ^0.8.15;
 
 // Demo deployments
 
-import {Script} from "forge-std/Script.sol";
-import {PolygonWorldID} from "src/PolygonWorldID.sol";
+import { Script } from "forge-std/Script.sol";
+import { PolygonWorldID } from "src/PolygonWorldID.sol";
 
 contract InitializePolygonWorldID is Script {
     address public polygonStateBridgeAddress;
@@ -26,8 +26,7 @@ contract InitializePolygonWorldID is Script {
     function setUp() public {
         privateKey = abi.decode(vm.parseJson(json, ".privateKey"), (uint256));
 
-        polygonStateBridgeAddress =
-            abi.decode(vm.parseJson(json, ".polygonStateBridgeAddress"), (address));
+        polygonStateBridgeAddress = abi.decode(vm.parseJson(json, ".polygonStateBridgeAddress"), (address));
         polygonWorldIDAddress = abi.decode(vm.parseJson(json, ".polygonWorldIDAddress"), (address));
     }
 

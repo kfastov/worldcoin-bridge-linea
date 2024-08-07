@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {Script} from "forge-std/Script.sol";
-import {OpStateBridge} from "src/OpStateBridge.sol";
+import { Script } from "forge-std/Script.sol";
+import { OpStateBridge } from "src/OpStateBridge.sol";
 
 /// @title Base State Bridge Gas Limit setter
 /// @notice forge script to set the correct gas limits for crossDomainMessenger calls to Base for the StateBridge
@@ -25,16 +25,14 @@ contract SetOpGasLimitBase is Script {
     ///////////////////////////////////////////////////////////////////
     ///                        OP GAS LIMITS                        ///
     ///////////////////////////////////////////////////////////////////
-    uint32 public gasLimitSendRootBase =
-        abi.decode(vm.parseJson(json, ".gasLimitSendRootBase"), (uint32));
+    uint32 public gasLimitSendRootBase = abi.decode(vm.parseJson(json, ".gasLimitSendRootBase"), (uint32));
     uint32 public gasLimitSetRootHistoryExpiryBase =
         abi.decode(vm.parseJson(json, ".gasLimitSetRootHistoryExpiryBase"), (uint32));
     uint32 public gasLimitTransferOwnershipBase =
         abi.decode(vm.parseJson(json, ".gasLimitTransferOwnershipBase"), (uint32));
 
     function setUp() public {
-        baseStateBridgeAddress =
-            abi.decode(vm.parseJson(json, ".baseStateBridgeAddress"), (address));
+        baseStateBridgeAddress = abi.decode(vm.parseJson(json, ".baseStateBridgeAddress"), (address));
 
         baseStateBridge = OpStateBridge(baseStateBridgeAddress);
     }
