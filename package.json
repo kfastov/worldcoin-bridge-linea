@@ -1,6 +1,7 @@
 {
   "name": "@kfastov/worldcoin-bridge-linea",
   "description": "World ID state bridge for Linea",
+  "type": "module",
   "version": "1.0.0",
   "author": {
     "name": "Konstantin Fastov",
