@@ -9,7 +9,7 @@ contract InitializeLineaStateBridge is Script {
 
     address public lineaWorldIDAddress;
     address public lineaStateBridgeAddress;
-    address public messageServiceAddress;
+    address public messageServiceAddressL2;
 
     ///////////////////////////////////////////////////////////////////
     ///                            CONFIG                           ///
@@ -21,7 +21,7 @@ contract InitializeLineaStateBridge is Script {
     function setUp() public {
         lineaStateBridgeAddress = abi.decode(vm.parseJson(json, ".lineaStateBridgeAddress"), (address));
         lineaWorldIDAddress = abi.decode(vm.parseJson(json, ".lineaWorldIDAddress"), (address));
-        messageServiceAddress = abi.decode(vm.parseJson(json, ".messageServiceAddress"), (address));
+        messageServiceAddressL2 = abi.decode(vm.parseJson(json, ".messageServiceAddressL2"), (address));
     }
 
     function run() external {
@@ -29,7 +29,7 @@ contract InitializeLineaStateBridge is Script {
         vm.startBroadcast(privateKey);
 
         lineaStateBridge = LineaStateBridge(lineaStateBridgeAddress);
-        lineaStateBridge.transferOwnershipLinea(messageServiceAddress, lineaStateBridgeAddress);
+        lineaStateBridge.transferOwnershipLinea(messageServiceAddressL2, lineaStateBridgeAddress);
         vm.stopBroadcast();
     }
 }

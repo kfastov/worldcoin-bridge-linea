@@ -24,7 +24,7 @@ contract DeployLineaWorldID is Script {
         address tempAddress = msg.sender;
 
         remoteSenderAddress = tempAddress;
-        messageServiceAddress = abi.decode(vm.parseJson(json, ".messageServiceAddress"), (address));
+        messageServiceAddress = abi.decode(vm.parseJson(json, ".messageServiceAddressL2"), (address));
         // remoteSenderAddress = abi.decode(vm.parseJson(json, ".lineaStateBridgeAddress"), (address));
         treeDepth = uint8(30);
     }

@@ -20,8 +20,8 @@ contract DeployLineaStateBridge is Script {
 
     function setUp() public {
         // https://docs.worldcoin.org/reference/address-book
-        messageServiceAddress = address(0x971e727e956690b9957be6d51Ec16E73AcAC83A7);
 
+        messageServiceAddress = abi.decode(vm.parseJson(json, ".messageServiceAddressL1"), (address));
         lineaWorldIDAddress = abi.decode(vm.parseJson(json, ".lineaWorldIDAddress"), (address));
         worldIDIdentityManagerAddress = abi.decode(vm.parseJson(json, ".worldIDIdentityManagerAddress"), (address));
     }
