@@ -13,16 +13,15 @@
     }
   ],
   "dependencies": {
-    "@openzeppelin/contracts": "^4.9.6",
-    "@openzeppelin/contracts-upgradeable": "^4.9.6",
-    "@rari-capital/solmate": "github:rari-capital/solmate#8f9b23f",
+    "@openzeppelin/contracts": "^5.0.2",
+    "@openzeppelin/contracts-upgradeable": "^5.0.2",
     "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge#29641f7",
     "linea-contracts": "github:Consensys/linea-contracts"
   },
   "devDependencies": {
     "forge-std": "github:foundry-rs/forge-std#v1.8.1",
-    "prettier": "^3.0.0",
-    "solhint": "^3.6.2"
+    "prettier": "^3.3.3",
+    "solhint": "^5.0.3"
   },
   "keywords": [
     "blockchain",

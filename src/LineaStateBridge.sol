@@ -8,7 +8,7 @@ import { ILineaWorldID } from "./interfaces/ILineaWorldID.sol";
 import { IRootHistory } from "world-id-state-bridge/interfaces/IRootHistory.sol";
 import { IWorldIDIdentityManager } from "world-id-state-bridge/interfaces/IWorldIDIdentityManager.sol";
 import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
-import { ICrossDomainOwnableLinea } from "./interfaces/ICrossDomainOwnableLinea.sol";
+import { LineaWorldID } from "./LineaWorldID.sol";
 
 /// @title World ID State Bridge Linea
 /// @author Worldcoin & James Harrison
@@ -142,6 +142,7 @@ contract LineaStateBridge is Ownable2Step {
     /// @param _isLocal Configures the locality of the ownership.
 
     function transferOwnership(address _owner, bool _isLocal) external onlyOwner {
+         LineaWorldID(lineaWorldIDAddress).transferOwnership(_owner, _isLocal);
         if (_owner == address(0)) {
             revert AddressZero();
         }
@@ -158,18 +159,8 @@ contract LineaStateBridge is Ownable2Step {
     /// @notice Sets or updates the messaging service
     /// @param _messageService The new message service address, cannot be empty.
     function setMessagingService(address _messageService) public onlyOwner {
-        if (_messageService == address(0)) {
-            revert AddressZero();
+        LineaWorldID(lineaWorldIDAddress).setMessagingService(_messageService);
         }
-
-        // Encoding the call to setMessagingService on ICrossDomainOwnableLinea
-        bytes memory message = abi.encodeCall(ICrossDomainOwnableLinea.setMessagingService, (_messageService));
-
-        // Sending the message to LineaWorldID via IMessageService
-        IMessageService(messageServiceAddress).sendMessage(lineaWorldIDAddress, _gasLimitTransferOwnership, message);
-
-        emit UpdatedMessageServiceLinea(owner(), _messageService);
-    }
 
     /// @notice Adds functionality to the StateBridge to set the root history expiry on LineaWorldID
     /// @param _rootHistoryExpiry new root history expiry
