@@ -8,8 +8,7 @@ import { ILineaWorldID } from "./interfaces/ILineaWorldID.sol";
 import { IRootHistory } from "world-id-state-bridge/interfaces/IRootHistory.sol";
 import { IWorldIDIdentityManager } from "world-id-state-bridge/interfaces/IWorldIDIdentityManager.sol";
 import { Ownable2Step } from "@openzeppelin/contracts/access/Ownable2Step.sol";
-import { LineaWorldID } from "./LineaWorldID.sol";
-
+import { ICrossDomainOwnableLinea } from "./interfaces/ICrossDomainOwnableLinea.sol";
 /// @title World ID State Bridge Linea
 /// @author Worldcoin & James Harrison
 /// @notice Distributes new World ID Identity Manager roots to an Linea Stack network
