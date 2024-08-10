@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import { IMessageService } from "linea-contracts/interfaces/IMessageService.sol";
 
 /// @title CrossDomainOwnableLinea
