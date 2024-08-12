@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import { Script } from "forge-std/src/Script.sol";
+import { Script } from "forge-std/Script.sol";
 import { LineaStateBridge } from "../LineaStateBridge.sol";
 
 contract InitializeLineaStateBridge is Script {
@@ -29,7 +29,7 @@ contract InitializeLineaStateBridge is Script {
         vm.startBroadcast(privateKey);
 
         lineaStateBridge = LineaStateBridge(lineaStateBridgeAddress);
-        lineaStateBridge.transferOwnershipLinea(messageServiceAddressL2, lineaStateBridgeAddress);
+        lineaStateBridge.transferOwnership(lineaStateBridgeAddress, false);
         vm.stopBroadcast();
     }
 }

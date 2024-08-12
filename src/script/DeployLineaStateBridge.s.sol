@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import { Script } from "forge-std/src/Script.sol";
+import "forge-std/console.sol";
+import { Script } from "forge-std/Script.sol";
 import { LineaStateBridge } from "../LineaStateBridge.sol";
 
 contract DeployLineaStateBridge is Script {
@@ -30,7 +31,23 @@ contract DeployLineaStateBridge is Script {
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(privateKey);
 
-        bridge = new LineaStateBridge(worldIDIdentityManagerAddress, lineaWorldIDAddress, messageServiceAddress);
+        // Check if lineaStateBridgeAddress is already in the JSON config
+        bytes memory encodedAddress = vm.parseJson(json, ".lineaStateBridgeAddress");
+
+        if (encodedAddress.length > 0) {
+            // If the address exists, load it
+            address existingBridgeAddress = abi.decode(encodedAddress, (address));
+            bridge = LineaStateBridge(existingBridgeAddress);
+            console.log("Loaded existing LineaStateBridge at:", address(bridge));
+        } else {
+            // If the address doesn't exist, deploy a new contract
+            bridge = new LineaStateBridge(worldIDIdentityManagerAddress, lineaWorldIDAddress, messageServiceAddress);
+            console.log("Deployed new LineaStateBridge at:", address(bridge));
+
+            // Store the deployed address in the config JSON
+            vm.writeJson(vm.toString(address(bridge)), path, ".lineaStateBridgeAddress");
+        }
+
         vm.stopBroadcast();
     }
 }

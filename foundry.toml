@@ -14,7 +14,7 @@ script = "script"
 solc = "0.8.19"
 src = "src"
 test = "test"
-fs_permissions = [{ access = "read", path = "./" }]
+fs_permissions = [{ access = "read-write", path = "./src/script/.deploy-config.json" }]
 
 
 [profile.ci]
