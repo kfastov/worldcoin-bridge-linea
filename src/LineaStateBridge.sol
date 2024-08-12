@@ -141,14 +141,12 @@ contract LineaStateBridge is Ownable2Step {
     /// @param _isLocal Configures the locality of the ownership.
 
     function transferOwnership(address _owner, bool _isLocal) external onlyOwner {
-        if (_owner == address(0)) {
+       if (_owner == address(0)) {
             revert AddressZero();
         }
-
-        // Encoding the call to transferOwnership on ICrossDomainOwnableLinea
+         // Encoding the call to transferOwnership on ICrossDomainOwnableLinea
         bytes memory message = abi.encodeCall(ICrossDomainOwnableLinea.transferOwnership, (_owner, _isLocal));
-
-        // Sending the message to LineaWorldID via IMessageService
+          // Sending the message to LineaWorldID via IMessageService
         IMessageService(messageServiceAddress).sendMessage(lineaWorldIDAddress, _gasLimitTransferOwnership, message);
 
         emit UpdatedRemoteAddressLinea(owner(), _owner);
@@ -157,7 +155,7 @@ contract LineaStateBridge is Ownable2Step {
     /// @notice Sets or updates the messaging service
     /// @param _messageService The new message service address, cannot be empty.
     function setMessagingService(address _messageService) public onlyOwner {
-        if (_messageService == address(0)) {
+         if (_messageService == address(0)) {
             revert AddressZero();
         }
 
@@ -166,8 +164,8 @@ contract LineaStateBridge is Ownable2Step {
 
         // Sending the message to LineaWorldID via IMessageService
         IMessageService(messageServiceAddress).sendMessage(lineaWorldIDAddress, _gasLimitTransferOwnership, message);
-
-        emit UpdatedMessageServiceLinea(owner(), _messageService);
+        
+              emit UpdatedMessageServiceLinea(owner(), _messageService);
     }
 
     /// @notice Adds functionality to the StateBridge to set the root history expiry on LineaWorldID
