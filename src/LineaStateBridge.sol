@@ -2,8 +2,7 @@
 pragma solidity 0.8.19;
 
 // Linea interface for cross domain messaging
-import { IMessageService } from "./interfaces/IMessageService.sol";
-import { MessageServiceBase } from "./MessageServiceBase.sol";
+import { IMessageService } from "linea-contracts/interfaces/IMessageService.sol";
 import { ILineaWorldID } from "./interfaces/ILineaWorldID.sol";
 import { IRootHistory } from "world-id-state-bridge/interfaces/IRootHistory.sol";
 import { IWorldIDIdentityManager } from "world-id-state-bridge/interfaces/IWorldIDIdentityManager.sol";
