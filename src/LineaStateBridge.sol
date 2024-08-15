@@ -142,7 +142,7 @@ contract LineaStateBridge is Ownable2Step {
     /// @param _owner   The new owner of the contract.
     /// @param _isLocal Configures the locality of the ownership.
 
-    function transferOwnership(address _owner, bool _isLocal) external onlyOwner payable {
+    function transferOwnershipLinea(address _owner, bool _isLocal) external onlyOwner payable {
         if (_owner == address(0)) {
             revert AddressZero();
         }
