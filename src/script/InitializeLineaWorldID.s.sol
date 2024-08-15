@@ -2,14 +2,14 @@
 pragma solidity 0.8.19;
 
 import { Script } from "forge-std/Script.sol";
-import { LineaStateBridge } from "../LineaStateBridge.sol";
+import { console } from "forge-std/console.sol";
+import { LineaWorldID } from "../LineaWorldID.sol";
 
-contract InitializeLineaStateBridge is Script {
-    LineaStateBridge public lineaStateBridge;
+contract InitializeLineaWorldID is Script {
+    LineaWorldID public lineaWorldID;
 
-    address public lineaWorldIDAddress;
-    address public lineaStateBridgeAddress;
-    address public messageServiceAddressL2;
+    address lineaWorldIDAddress;
+    address lineaStateBridgeAddress;
 
     ///////////////////////////////////////////////////////////////////
     ///                            CONFIG                           ///
@@ -19,17 +19,21 @@ contract InitializeLineaStateBridge is Script {
     string public json = vm.readFile(path);
 
     function setUp() public {
-        lineaStateBridgeAddress = abi.decode(vm.parseJson(json, ".lineaStateBridgeAddress"), (address));
         lineaWorldIDAddress = abi.decode(vm.parseJson(json, ".lineaWorldIDAddress"), (address));
-        messageServiceAddressL2 = abi.decode(vm.parseJson(json, ".messageServiceAddressL2"), (address));
+        lineaStateBridgeAddress = abi.decode(vm.parseJson(json, ".lineaStateBridgeAddress"), (address));
     }
 
     function run() external {
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(privateKey);
 
-        lineaStateBridge = LineaStateBridge(lineaStateBridgeAddress);
-        lineaStateBridge.transferOwnership(lineaStateBridgeAddress, false);
+        lineaWorldID = LineaWorldID(lineaWorldIDAddress);
+
+        // Transfer ownership to LineaStateBridge on L1
+        lineaWorldID.transferOwnership(lineaStateBridgeAddress, false);
+
         vm.stopBroadcast();
+
+        console.log("Finished processing events");
     }
 }

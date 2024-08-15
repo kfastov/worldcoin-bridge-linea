@@ -29,7 +29,7 @@ contract DeployLineaWorldID is Script {
         vm.startBroadcast(privateKey);
 
         // Check if lineaWorldIdAddress is already in the JSON config
-        bytes memory encodedAddress = vm.parseJson(json, ".lineaWorldIdAddress");
+        bytes memory encodedAddress = vm.parseJson(json, ".lineaWorldIDAddress");
 
         if (encodedAddress.length > 0) {
             // If the address exists, load it
@@ -42,7 +42,7 @@ contract DeployLineaWorldID is Script {
             console.log("Deployed new LineaWorldID at:", address(lineaWorldId));
 
             // Store the deployed address in the config JSON
-            vm.writeJson(vm.toString(address(lineaWorldId)), path, ".lineaWorldIdAddress");
+            vm.writeJson(vm.toString(address(lineaWorldId)), path, ".lineaWorldIDAddress");
         }
 
         vm.stopBroadcast();
