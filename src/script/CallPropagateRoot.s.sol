@@ -29,7 +29,7 @@ contract CallPropagateRoot is Script {
         lineaStateBridge.setGasLimitTransferOwnershipOp(0.001 ether);
 
         // Propagate root to L2
-        lineaStateBridge.propagateRoot{value: 0.001 ether}();
+        lineaStateBridge.propagateRoot{ value: 0.001 ether }();
 
         vm.stopBroadcast();
     }

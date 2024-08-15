@@ -36,13 +36,12 @@ contract ManualClaim is Script {
         messageService.claimMessage(
             lineaStateBridgeAddress,
             lineaWorldIDAddress,
-            1000000000000000,
+            1_000_000_000_000_000,
             0,
             payable(0),
             hex"FBDE929B214425A01EFDB7EC3937A0BFF5328FA2610ED2F9C5AB15C69BA27D01443055F0",
             3795
         );
-
 
         vm.stopBroadcast();
 
