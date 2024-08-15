@@ -7,7 +7,7 @@ interface ICrossDomainOwnableLinea {
     /// @param _isLocal Configures the locality of the ownership.
     function transferOwnership(address _owner, bool _isLocal) external;
 
-    /// @notice Sets or updates the messaging service
+    /// @notice Sets or updates the message service
     /// @param _messageService The new message service address, cannot be empty.
-    function setMessagingService(address _messageService) external;
+    function setMessageService(address _messageService) external;
 }

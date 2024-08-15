@@ -6,8 +6,8 @@ import { IMessageService } from "linea-contracts/interfaces/IMessageService.sol"
 
 /// @title CrossDomainOwnableLinea
 /// @notice This contract extends the OpenZeppelin `Ownable` contract for L2 contracts to be owned
-///         by contracts on either L1 or L2. Since Linea can have several messaging services, this
-///         contract has an initializer that takes in a messaging service address.
+///         by contracts on either L1 or L2. Since Linea can have several message services, this
+///         contract has an initializer that takes in a message service address.
 abstract contract CrossDomainOwnableLinea is Ownable {
     IMessageService public messageService;
 
@@ -22,9 +22,9 @@ abstract contract CrossDomainOwnableLinea is Ownable {
     /// @param isLocal       Configures the `isLocal` contract variable.
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner, bool isLocal);
 
-    /// @notice Emitted when the messaging service is set or updated
-    /// @param oldMessageService The old messaging service address.
-    /// @param newMessageService The new messaging service address.
+    /// @notice Emitted when the message service is set or updated
+    /// @param oldMessageService The old message service address.
+    /// @param newMessageService The new message service address.
     event MessageServiceUpdated(address indexed oldMessageService, address indexed newMessageService);
 
     /// @notice Emitted when an attempt is made to set an address to zero
@@ -51,9 +51,9 @@ abstract contract CrossDomainOwnableLinea is Ownable {
         emit OwnershipTransferred(oldOwner, _owner, _isLocal);
     }
 
-    /// @notice Sets or updates the messaging service
+    /// @notice Sets or updates the message service
     /// @param _messageService The new message service address, cannot be empty.
-    function setMessagingService(address _messageService) public onlyOwner {
+    function setMessageService(address _messageService) public onlyOwner {
         if (_messageService == address(0)) {
             revert ZeroAddressNotAllowed();
         }
@@ -67,7 +67,7 @@ abstract contract CrossDomainOwnableLinea is Ownable {
     /// @notice Constructs the CrossDomainOwnableLinea contract
     /// @param _messageService The message service address, cannot be empty.
     constructor(address _messageService) {
-        setMessagingService(_messageService);
+        setMessageService(_messageService);
     }
 
     /// @notice Overrides the implementation of the `onlyOwner` modifier to check ownership

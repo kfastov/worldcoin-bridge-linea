@@ -36,8 +36,8 @@ contract LineaStateBridge is Ownable2Step {
     /// @notice Amount of fee on Linea for transferOwnershipLinea
     uint256 internal _feeTransferOwnership;
 
-    /// @notice Amount of fee on Linea for setMessagingService
-    uint256 internal _feeSetMessagingService;
+    /// @notice Amount of fee on Linea for setMessageService
+    uint256 internal _feeSetMessageService;
 
     /// @notice The default fee for Linea transactions.
     /// Setting this to 0 means that messages will have to be claimed manually on L2
@@ -78,6 +78,10 @@ contract LineaStateBridge is Ownable2Step {
     /// @param _lineaFee The new fee for transferOwnershipLinea
     event SetFeeTransferOwnershipLinea(uint256 _lineaFee);
 
+    /// @notice Emitted when the StateBridge sets the fee for setMessageService
+    /// @param _lineaFee The new fee for setMessageService
+    event SetFeeSetMessageService(uint256 _lineaFee);
+
     ///////////////////////////////////////////////////////////////////
     ///                            ERRORS                           ///
     ///////////////////////////////////////////////////////////////////
@@ -111,7 +115,7 @@ contract LineaStateBridge is Ownable2Step {
         _feePropagateRoot = DEFAULT_LINEA_FEE;
         _feeSetRootHistoryExpiry = DEFAULT_LINEA_FEE;
         _feeTransferOwnership = DEFAULT_LINEA_FEE;
-        _feeSetMessagingService = DEFAULT_LINEA_FEE;
+        _feeSetMessageService = DEFAULT_LINEA_FEE;
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -124,7 +128,7 @@ contract LineaStateBridge is Ownable2Step {
         uint256 latestRoot = IWorldIDIdentityManager(worldIDAddress).latestRoot();
 
         // The `encodeCall` function is strongly typed, so this checks that we are passing the
-        // correct data to the Linea messaging service.
+        // correct data to the Linea message service.
         bytes memory message = abi.encodeCall(ILineaWorldID.receiveRoot, (latestRoot));
 
         IMessageService(messageServiceAddress).sendMessage{ value: msg.value }(
@@ -157,19 +161,19 @@ contract LineaStateBridge is Ownable2Step {
         emit UpdatedRemoteAddressLinea(owner(), _owner);
     }
 
-    /// @notice Sets or updates the messaging service
+    /// @notice Sets or updates the message service
     /// @param _messageService The new message service address, cannot be empty.
-    function setMessagingService(address _messageService) public payable onlyOwner {
+    function setMessageService(address _messageService) public payable onlyOwner {
         if (_messageService == address(0)) {
             revert AddressZero();
         }
 
-        // Encoding the call to setMessagingService on ICrossDomainOwnableLinea
-        bytes memory message = abi.encodeCall(ICrossDomainOwnableLinea.setMessagingService, (_messageService));
+        // Encoding the call to setMessageService on ICrossDomainOwnableLinea
+        bytes memory message = abi.encodeCall(ICrossDomainOwnableLinea.setMessageService, (_messageService));
 
         // Sending the message to LineaWorldID via IMessageService
         IMessageService(messageServiceAddress).sendMessage{ value: msg.value }(
-            lineaWorldIDAddress, _feeSetMessagingService, message
+            lineaWorldIDAddress, _feeSetMessageService, message
         );
 
         emit UpdatedMessageServiceLinea(owner(), _messageService);
@@ -198,24 +202,30 @@ contract LineaStateBridge is Ownable2Step {
 
     /// @notice Sets the fee for the propagateRoot method
     /// @param _lineaFee The new fee for the propagateRoot method
-    function setFeePropagateRoot(uint32 _lineaFee) external onlyOwner {
+    function setFeePropagateRoot(uint256 _lineaFee) external onlyOwner {
         _feePropagateRoot = _lineaFee;
         emit SetFeePropagateRoot(_lineaFee);
     }
 
     /// @notice Sets the fee for the SetRootHistoryExpiry method
     /// @param _lineaFee The new fee for the SetRootHistoryExpiry method
-    function setFeeSetRootHistoryExpiry(uint32 _lineaFee) external onlyOwner {
+    function setFeeSetRootHistoryExpiry(uint256 _lineaFee) external onlyOwner {
         _feeSetRootHistoryExpiry = _lineaFee;
         emit SetFeeSetRootHistoryExpiry(_lineaFee);
     }
 
     /// @notice Sets the fee for the transferOwnershipLinea method
     /// @param _lineaFee The new fee for the transferOwnershipLinea method
-    function setFeeTransferOwnershipLinea(uint32 _lineaFee) external onlyOwner {
+    function setFeeTransferOwnershipLinea(uint256 _lineaFee) external onlyOwner {
         _feeTransferOwnership = _lineaFee;
-
         emit SetFeeTransferOwnershipLinea(_lineaFee);
+    }
+
+    /// @notice Sets the fee for the setMessageService method
+    /// @param _lineaFee The new fee for the setMessageService method
+    function setFeeSetMessageService(uint256 _lineaFee) external onlyOwner {
+        _feeSetMessageService = _lineaFee;
+        emit SetFeeSetMessageService(_lineaFee);
     }
 
     ///////////////////////////////////////////////////////////////////
