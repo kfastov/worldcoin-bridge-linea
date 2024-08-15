@@ -26,7 +26,7 @@ contract CallPropagateRoot is Script {
 
         lineaStateBridge = LineaStateBridge(lineaStateBridgeAddress);
 
-        lineaStateBridge.setGasLimitTransferOwnershipOp(0.001 ether);
+        lineaStateBridge.setFeePropagateRoot(0.001 ether);
 
         // Propagate root to L2
         lineaStateBridge.propagateRoot{ value: 0.001 ether }();

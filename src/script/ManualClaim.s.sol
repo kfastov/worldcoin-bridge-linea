@@ -4,7 +4,7 @@ pragma solidity 0.8.19;
 import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
 import { LineaWorldID } from "../LineaWorldID.sol";
-import { IMessageService } from "../interfaces/IMessageService.sol";
+import { IMessageService } from "linea-contracts/interfaces/IMessageService.sol";
 
 contract ManualClaim is Script {
     IMessageService public messageService;
