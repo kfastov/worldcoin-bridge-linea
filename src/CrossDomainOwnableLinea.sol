@@ -39,7 +39,7 @@ abstract contract CrossDomainOwnableLinea is Ownable {
     /// @notice Allows for ownership to be transferred with specifying the locality.
     /// @param _owner   The new owner of the contract.
     /// @param _isLocal Configures the locality of the ownership.
-    function transferOwnershipLinea(address _owner, bool _isLocal) external virtual onlyOwner {
+    function transferOwnership(address _owner, bool _isLocal) external virtual onlyOwner {
         if (_owner == address(0)) {
             revert ZeroAddressNotAllowed();
         }
