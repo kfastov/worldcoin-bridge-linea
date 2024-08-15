@@ -127,7 +127,7 @@ contract LineaStateBridge is Ownable2Step {
         // correct data to the Linea messaging service.
         bytes memory message = abi.encodeCall(ILineaWorldID.receiveRoot, (latestRoot));
 
-        IMessageService(messageServiceAddress).sendMessage{value: msg.value}(
+        IMessageService(messageServiceAddress).sendMessage{ value: msg.value }(
             // Contract address on Linea
             lineaWorldIDAddress,
             _feePropagateRoot,
@@ -141,7 +141,7 @@ contract LineaStateBridge is Ownable2Step {
     /// @param _owner   The new owner of the contract.
     /// @param _isLocal Configures the locality of the ownership.
 
-    function transferOwnershipLinea(address _owner, bool _isLocal) external onlyOwner payable {
+    function transferOwnershipLinea(address _owner, bool _isLocal) external payable onlyOwner {
         if (_owner == address(0)) {
             revert AddressZero();
         }
@@ -150,10 +150,8 @@ contract LineaStateBridge is Ownable2Step {
         bytes memory message = abi.encodeCall(ICrossDomainOwnableLinea.transferOwnership, (_owner, _isLocal));
 
         // Sending the message to LineaWorldID via IMessageService
-        IMessageService(messageServiceAddress).sendMessage{value: msg.value}(
-            lineaWorldIDAddress,
-            _feeTransferOwnership,
-            message
+        IMessageService(messageServiceAddress).sendMessage{ value: msg.value }(
+            lineaWorldIDAddress, _feeTransferOwnership, message
         );
 
         emit UpdatedRemoteAddressLinea(owner(), _owner);
@@ -161,7 +159,7 @@ contract LineaStateBridge is Ownable2Step {
 
     /// @notice Sets or updates the messaging service
     /// @param _messageService The new message service address, cannot be empty.
-    function setMessagingService(address _messageService) public onlyOwner payable {
+    function setMessagingService(address _messageService) public payable onlyOwner {
         if (_messageService == address(0)) {
             revert AddressZero();
         }
@@ -170,10 +168,8 @@ contract LineaStateBridge is Ownable2Step {
         bytes memory message = abi.encodeCall(ICrossDomainOwnableLinea.setMessagingService, (_messageService));
 
         // Sending the message to LineaWorldID via IMessageService
-        IMessageService(messageServiceAddress).sendMessage{value: msg.value}(
-            lineaWorldIDAddress,
-            _feeSetMessagingService,
-            message
+        IMessageService(messageServiceAddress).sendMessage{ value: msg.value }(
+            lineaWorldIDAddress, _feeSetMessagingService, message
         );
 
         emit UpdatedMessageServiceLinea(owner(), _messageService);
@@ -181,12 +177,12 @@ contract LineaStateBridge is Ownable2Step {
 
     /// @notice Adds functionality to the StateBridge to set the root history expiry on LineaWorldID
     /// @param _rootHistoryExpiry new root history expiry
-    function setRootHistoryExpiry(uint256 _rootHistoryExpiry) external onlyOwner payable {
+    function setRootHistoryExpiry(uint256 _rootHistoryExpiry) external payable onlyOwner {
         // The `encodeCall` function is strongly typed, so this checks that we are passing the
         // correct data to the linea bridge.
         bytes memory message = abi.encodeCall(IRootHistory.setRootHistoryExpiry, (_rootHistoryExpiry));
 
-        IMessageService(messageServiceAddress).sendMessage{value: msg.value}(
+        IMessageService(messageServiceAddress).sendMessage{ value: msg.value }(
             // Contract address on Linea
             lineaWorldIDAddress,
             _feeSetRootHistoryExpiry,
