@@ -108,17 +108,26 @@ async function getLineaWorldIDAddress(config) {
   if (!config.lineaWorldIDAddress) {
     config.lineaWorldIDAddress = process.env.LINEA_WORLD_ID_ADDRESS;
   }
+  if (!config.lineaWorldIDAddress) {
+    config.lineaWorldIDAddress = await ask("Enter Linea WorldID Address: ");
+  }
 }
 
 async function getLineaStateBridgeAddress(config) {
   if (!config.lineaStateBridgeAddress) {
     config.lineaStateBridgeAddress = process.env.LINEA_STATE_BRIDGE_ADDRESS;
   }
+  if (!config.lineaStateBridgeAddress) {
+    config.lineaStateBridgeAddress = await ask("Enter Linea State Bridge Address: ");
+  }
 }
 
 async function getWorldIDIdentityManagerAddress(config) {
   if (!config.worldIDIdentityManagerAddress) {
     config.worldIDIdentityManagerAddress = process.env.WORLD_ID_IDENTITY_MANAGER_ADDRESS;
+  }
+  if (!config.worldIDIdentityManagerAddress) {
+    config.worldIDIdentityManagerAddress = await ask("Enter WorldID Identity Manager Address: ");
   }
 }
 
