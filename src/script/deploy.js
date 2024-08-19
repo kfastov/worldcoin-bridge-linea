@@ -5,12 +5,10 @@ import dotenv from "dotenv";
 import ora from "ora";
 import { Command } from "commander";
 import { execSync } from "child_process";
-import { Network, Alchemy, Utils } from "alchemy-sdk";
-import { ethers } from "ethers";
 
 // === Constants ==================================================================================
-
 const CONFIG_FILENAME = "src/script/.deploy-config.json";
+const DEFAULT_RPC_URL = "http://localhost:8545";
 
 // === Implementation =============================================================================
 
@@ -72,11 +70,20 @@ async function getPrivateKey(config) {
   if (!config.privateKey) {
     config.privateKey = process.env.PRIVATE_KEY;
   }
+  if (!config.privateKey) {
+    config.privateKey = await ask("Enter your private key: ");
+  }
 }
 
 async function getEthereumRpcUrl(config) {
   if (!config.ethereumRpcUrl) {
     config.ethereumRpcUrl = process.env.ETH_RPC_URL;
+  }
+  if (!config.ethereumRpcUrl) {
+    config.ethereumRpcUrl = await ask(`Enter Ethereum RPC URL: (${DEFAULT_RPC_URL}) `);
+  }
+  if (!config.ethereumRpcUrl) {
+    config.ethereumRpcUrl = DEFAULT_RPC_URL;
   }
 }
 
@@ -84,17 +91,33 @@ async function getLineaRpcUrl(config) {
   if (!config.lineaRpcUrl) {
     config.lineaRpcUrl = process.env.LINEA_RPC_URL;
   }
+  if (!config.lineaRpcUrl) {
+    config.lineaRpcUrl = await ask(`Enter Linea RPC URL: (${DEFAULT_RPC_URL}) `);
+  }
+  if (!config.lineaRpcUrl) {
+    config.lineaRpcUrl = DEFAULT_RPC_URL;
+  }
 }
 
 async function getEthereumEtherscanApiKey(config) {
   if (!config.ethereumEtherscanApiKey) {
     config.ethereumEtherscanApiKey = process.env.ETHERSCAN_API_KEY;
   }
+  if (!config.ethereumEtherscanApiKey) {
+    config.ethereumEtherscanApiKey = await ask(
+      `Enter Ethereum Etherscan API KEY: (https://etherscan.io/myaccount) (Leave it empty for mocks) `,
+    );
+  }
 }
 
 async function getLineaEtherscanApiKey(config) {
   if (!config.lineaScanApiKey) {
     config.lineaScanApiKey = process.env.LINEA_SCAN_API_KEY;
+  }
+  if (!config.lineaScanApiKey) {
+    config.lineaScanApiKey = await ask(
+      `Enter Lineascan API KEY: (https://lineascan.build/myaccount) (Leave it empty for mocks) `,
+    );
   }
 }
 
