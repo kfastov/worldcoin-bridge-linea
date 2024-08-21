@@ -15,7 +15,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.6",
     "@openzeppelin/contracts-upgradeable": "^4.9.6",
-    "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge#29641f7",
+    "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge#729d234",
     "linea-contracts": "github:Consensys/linea-contracts"
   },
   "devDependencies": {
