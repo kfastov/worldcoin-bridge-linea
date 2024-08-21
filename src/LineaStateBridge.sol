@@ -167,7 +167,7 @@ contract LineaStateBridge is Ownable2Step {
 
         // Sending the message to LineaWorldID via IMessageService
         IMessageService(messageServiceAddress).sendMessage(lineaWorldIDAddress, _gasLimitTransferOwnership, message);
-        
+
         emit UpdatedMessageServiceLinea(owner(), _messageService);
     }
 
