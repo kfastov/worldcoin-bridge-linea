@@ -39,13 +39,7 @@ contract ManualClaim is Script {
 
         // Manually claim the message
         messageService.claimMessage(
-            lineaStateBridgeAddress,
-            lineaWorldIDAddress,
-            fee,
-            value,
-            fee_recipient,
-            data,
-            nonce
+            lineaStateBridgeAddress, lineaWorldIDAddress, fee, value, fee_recipient, data, nonce
         );
 
         vm.stopBroadcast();
