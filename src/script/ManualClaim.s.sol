@@ -28,19 +28,25 @@ contract ManualClaim is Script {
 
     function run() external {
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
+        uint256 messageAmount = vm.envUint("MESSAGE_AMOUNT");
+        uint256 messageNonce = vm.envUint("MESSAGE_NONCE");
+        bytes memory messageData = vm.envBytes("MESSAGE_DATA");
+        uint256 messageFee = vm.envUint("MESSAGE_FEE");
+        address payable refundAddress = payable(vm.envAddress("REFUND_ADDRESS"));
+
         vm.startBroadcast(privateKey);
 
         messageService = IMessageService(messageServiceAddressL2);
 
-        // Manually claim the message
+        // Manually claim the message using environment variables
         messageService.claimMessage(
             lineaStateBridgeAddress,
             lineaWorldIDAddress,
-            1_000_000_000_000_000,
-            0,
-            payable(0),
-            hex"FBDE929B214425A01EFDB7EC3937A0BFF5328FA2610ED2F9C5AB15C69BA27D01443055F0",
-            3795
+            messageAmount,
+            messageFee,
+            refundAddress,
+            messageData,
+            messageNonce
         );
 
         vm.stopBroadcast();
