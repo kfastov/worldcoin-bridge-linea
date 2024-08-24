@@ -32,6 +32,7 @@ contract ManualClaim is Script {
         uint256 value = vm.envUint("VALUE");
         uint256 nonce = vm.envUint("NONCE");
         string calldata = vm.envString("CALLDATA");
+        address payable fee_recipient = payable(vm.envAddress("FEE_RECIPIENT"));
         vm.startBroadcast(privateKey);
 
         messageService = IMessageService(messageServiceAddressL2);
@@ -42,7 +43,7 @@ contract ManualClaim is Script {
             lineaWorldIDAddress,
             fee,
             value,
-            payable(0),
+            fee_recipient,
             calldata,
             nonce
         );
