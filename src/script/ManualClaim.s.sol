@@ -31,7 +31,7 @@ contract ManualClaim is Script {
         uint256 fee = vm.envUint("FEE");
         uint256 value = vm.envUint("VALUE");
         uint256 nonce = vm.envUint("NONCE");
-        string data = vm.envString("CALLDATA");
+        bytes memory data = vm.envBytes("CALLDATA");
         address payable fee_recipient = payable(vm.envAddress("FEE_RECIPIENT"));
         vm.startBroadcast(privateKey);
 
