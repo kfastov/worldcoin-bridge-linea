@@ -28,6 +28,10 @@ contract ManualClaim is Script {
 
     function run() external {
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
+        uint256 fee = vm.envUint("FEE");
+        uint256 value = vm.envUint("VALUE");
+        uint256 nonce = vm.envUint("NONCE");
+        string calldata = vm.envString("CALLDATA");
         vm.startBroadcast(privateKey);
 
         messageService = IMessageService(messageServiceAddressL2);
@@ -36,11 +40,11 @@ contract ManualClaim is Script {
         messageService.claimMessage(
             lineaStateBridgeAddress,
             lineaWorldIDAddress,
-            1_000_000_000_000_000,
-            0,
+            fee,
+            value,
             payable(0),
-            hex"FBDE929B214425A01EFDB7EC3937A0BFF5328FA2610ED2F9C5AB15C69BA27D01443055F0",
-            3795
+            calldata,
+            nonce
         );
 
         vm.stopBroadcast();
