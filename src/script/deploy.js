@@ -145,15 +145,6 @@ async function getLineaStateBridgeAddress(config) {
   }
 }
 
-async function getWorldIDIdentityManagerAddress(config) {
-  if (!config.worldIDIdentityManagerAddress) {
-    config.worldIDIdentityManagerAddress = process.env.WORLD_ID_IDENTITY_MANAGER_ADDRESS;
-  }
-  if (!config.worldIDIdentityManagerAddress) {
-    config.worldIDIdentityManagerAddress = await ask("Enter WorldID Identity Manager Address: ");
-  }
-}
-
 ///////////////////////////////////////////////////////////////////
 ///                            UTILS                            ///
 ///////////////////////////////////////////////////////////////////
@@ -287,7 +278,6 @@ async function deploymentMainnet(config) {
   await getTreeDepth(config);
   await saveConfiguration(config);
   await deployLineaWorldID(config);
-  await getWorldIDIdentityManagerAddress(config);
   await getLineaWorldIDAddress(config);
   await saveConfiguration(config);
   await deployLineaStateBridgeMainnet(config);
