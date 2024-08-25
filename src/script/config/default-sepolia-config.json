@@ -1,0 +1,7 @@
+{
+  "worldIDIdentityManagerAddress": "0xSepoliaWorldIDAddress",
+  "lineaStateBridgeAddress": "0xSepoliaStateBridgeAddress",
+  "lineaWorldIDAddress": "0xSepoliaWorldIDAddress",
+  "ethereumRpcUrl": "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+  "lineaRpcUrl": "https://linea-sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID"
+}

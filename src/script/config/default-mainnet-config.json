@@ -1,0 +1,7 @@
+{
+  "worldIDIdentityManagerAddress": "0xMainnetWorldIDAddress",
+  "lineaStateBridgeAddress": "0xMainnetStateBridgeAddress",
+  "lineaWorldIDAddress": "0xMainnetWorldIDAddress",
+  "ethereumRpcUrl": "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+  "lineaRpcUrl": "https://linea-mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID"
+}
