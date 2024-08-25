@@ -28,11 +28,11 @@ contract ManualClaim is Script {
 
     function run() external {
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
-        uint256 fee = vm.envUint("FEE");
-        uint256 value = vm.envUint("VALUE");
-        uint256 nonce = vm.envUint("NONCE");
-        bytes memory data = vm.envBytes("CALLDATA");
-        address payable fee_recipient = payable(vm.envAddress("FEE_RECIPIENT"));
+        uint256 fee = vm.envUint("MSG_CLAIM_FEE");
+        uint256 value = vm.envUint("MSG_CLAIM_VALUE");
+        uint256 nonce = vm.envUint("MSG_CLAIM_NONCE");
+        bytes memory data = vm.envBytes("MSG_CLAIM_CALLDATA");
+        address payable fee_recipient = payable(vm.envAddress("MSG_CLAIM_FEE_RECIPIENT"));
         vm.startBroadcast(privateKey);
 
         messageService = IMessageService(messageServiceAddressL2);
