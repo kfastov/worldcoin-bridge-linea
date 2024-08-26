@@ -37,6 +37,7 @@ contract ManualClaim is Script {
         messageService = IMessageService(messageServiceAddressL2);
 
         // Manually claim the message
+        // solhint-disable-next-line max-line-length
         messageService.claimMessage(lineaStateBridgeAddress, lineaWorldIDAddress, fee, value, feeRecipient, data, nonce);
 
         vm.stopBroadcast();
