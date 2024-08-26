@@ -28,7 +28,7 @@ const argv = yargs(hideBin(process.argv))
   .argv;
 
 const config = {
-  rpcUrl: argv.rpc || process.env.RPC_URL || 'https://rpc.sepolia.linea.build',
+  rpcUrl: argv.rpc || process.env.RPC_URL || 'https://rpc-sepolia.rockx.com',
   lineaStateBridgeAddress: argv.address || process.env.LINEA_STATE_BRIDGE_ADDRESS,
   propagationPeriod: argv.period || parseInt(process.env.PROPAGATION_PERIOD) || 3600000, 
   privateKey: process.env.PRIVATE_KEY

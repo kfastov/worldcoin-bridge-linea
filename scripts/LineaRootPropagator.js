@@ -10,7 +10,7 @@ class LineaRootPropagator {
     this.provider = new ethers.providers.JsonRpcProvider(config.rpcUrl);
     this.wallet = new ethers.Wallet(config.privateKey, this.provider);
     this.lineaStateBridge = new ethers.Contract(config.lineaStateBridgeAddress, LineaStateBridgeABI, this.wallet);
-    this.propagationPeriod = config.propagationPeriod || 3600000; // Default to 1 hour
+    this.propagationPeriod = config.propagationPeriod || 3600; // Default to 1 hour
     this.lineaSdk = new LineaSDK({ provider: this.provider });
     this.maxRetries = config.maxRetries || 3;
     this.gasMultiplier = config.gasMultiplier || 1.5;
@@ -30,15 +30,18 @@ class LineaRootPropagator {
         console.log(`Current gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} Gwei`);
 
         console.log('Estimating gas...');
+        const fee = ethers.utils.parseUnits("0.001", "ether")
         const gasLimit = await this.lineaStateBridge.estimateGas.propagateRoot({
-          gasPrice: gasPrice
+          gasPrice: gasPrice,
+          value: fee
         });
         console.log(`Estimated gas limit: ${gasLimit.toString()}`);
 
         console.log('Sending propagateRoot transaction...');
         const tx = await this.lineaStateBridge.propagateRoot({
           gasLimit: gasLimit.mul(12).div(10), // Add 20% buffer
-          gasPrice: gasPrice
+          gasPrice: gasPrice,
+          value: fee
         });
         console.log(`Transaction sent. Hash: ${tx.hash}`);
         
@@ -67,8 +70,8 @@ class LineaRootPropagator {
   }
 
   async start() {
-    console.log(`Starting root propagation cycle every ${this.propagationPeriod / 1000} seconds...`);
-    this.interval = setInterval(() => this.propagateRoot(), this.propagationPeriod);
+    console.log(`Starting root propagation cycle every ${this.propagationPeriod} seconds...`);
+    this.interval = setInterval(() => this.propagateRoot(), this.propagationPeriod * 1000);
     // Trigger first propagation immediately
     await this.propagateRoot();
   }
