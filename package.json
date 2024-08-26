@@ -18,10 +18,11 @@
     "@openzeppelin/contracts-upgradeable": "^4.9.6",
     "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge#729d234",
     "dotenv": "^16.0.3",
-    "ethers": "^5.7.2",
     "fs": "^0.0.1-security",
     "linea-contracts": "github:Consensys/linea-contracts",
     "yargs": "^17.7.2"
+    "ethers": "^6.13.2",
+    "linea-contracts": "github:Consensys/linea-contracts"
   },
   "devDependencies": {
     "forge-std": "github:foundry-rs/forge-std#v1.8.1",

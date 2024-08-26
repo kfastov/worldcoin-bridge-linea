@@ -8,8 +8,8 @@ import { LineaWorldID } from "../LineaWorldID.sol";
 contract InitializeLineaWorldID is Script {
     LineaWorldID public lineaWorldID;
 
-    address lineaWorldIDAddress;
-    address lineaStateBridgeAddress;
+    address public lineaWorldIDAddress;
+    address public lineaStateBridgeAddress;
 
     ///////////////////////////////////////////////////////////////////
     ///                            CONFIG                           ///
