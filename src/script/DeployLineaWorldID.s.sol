@@ -3,7 +3,7 @@ pragma solidity 0.8.19;
 
 import { Script } from "forge-std/Script.sol";
 import { LineaWorldID } from "../LineaWorldID.sol";
-import "forge-std/console.sol";
+import { console } from "forge-std/console.sol";
 
 contract DeployLineaWorldID is Script {
     LineaWorldID public lineaWorldId;

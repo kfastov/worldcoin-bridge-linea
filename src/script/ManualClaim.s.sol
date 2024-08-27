@@ -3,15 +3,14 @@ pragma solidity 0.8.19;
 
 import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
-import { LineaWorldID } from "../LineaWorldID.sol";
 import { IMessageService } from "linea-contracts/interfaces/IMessageService.sol";
 
 contract ManualClaim is Script {
     IMessageService public messageService;
 
-    address lineaWorldIDAddress;
-    address lineaStateBridgeAddress;
-    address messageServiceAddressL2;
+    address public lineaWorldIDAddress;
+    address public lineaStateBridgeAddress;
+    address public messageServiceAddressL2;
 
     ///////////////////////////////////////////////////////////////////
     ///                            CONFIG                           ///
@@ -32,15 +31,14 @@ contract ManualClaim is Script {
         uint256 value = vm.envUint("MSG_CLAIM_VALUE");
         uint256 nonce = vm.envUint("MSG_CLAIM_NONCE");
         bytes memory data = vm.envBytes("MSG_CLAIM_CALLDATA");
-        address payable fee_recipient = payable(vm.envAddress("MSG_CLAIM_FEE_RECIPIENT"));
+        address payable feeRecipient = payable(vm.envAddress("MSG_CLAIM_FEE_RECIPIENT"));
         vm.startBroadcast(privateKey);
 
         messageService = IMessageService(messageServiceAddressL2);
 
         // Manually claim the message
-        messageService.claimMessage(
-            lineaStateBridgeAddress, lineaWorldIDAddress, fee, value, fee_recipient, data, nonce
-        );
+        // solhint-disable-next-line max-line-length
+        messageService.claimMessage(lineaStateBridgeAddress, lineaWorldIDAddress, fee, value, feeRecipient, data, nonce);
 
         vm.stopBroadcast();
 

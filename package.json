@@ -17,6 +17,7 @@
     "@openzeppelin/contracts-upgradeable": "^4.9.6",
     "@prb/test": "^0.6.4",
     "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge#729d234",
+    "ethers": "^6.13.2",
     "linea-contracts": "github:Consensys/linea-contracts"
   },
   "devDependencies": {
