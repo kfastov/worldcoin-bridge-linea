@@ -84,10 +84,6 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
     /// @param _lineaFee The new fee for setMessageService
     event SetFeeSetMessageService(uint256 _lineaFee);
 
-    ///////////////////////////////////////////////////////////////////
-    ///                            ERRORS                           ///
-    ///////////////////////////////////////////////////////////////////
-
     /// @notice Emitted when an attempt is made to renounce ownership.
     error CannotRenounceOwnership();
 
