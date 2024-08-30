@@ -16,15 +16,26 @@ contract DeployLineaStateBridge is Script {
     ///                            CONFIG                           ///
     ///////////////////////////////////////////////////////////////////
     string public root = vm.projectRoot();
-    string public path = "src/script/.deploy-config.json";
+    string public path = "./config.json";
     string public json = vm.readFile(path);
+
+    error ConfigError();
 
     function setUp() public {
         // https://docs.worldcoin.org/reference/address-book
 
-        messageServiceAddress = abi.decode(vm.parseJson(json, ".messageServiceAddressL1"), (address));
-        lineaWorldIDAddress = abi.decode(vm.parseJson(json, ".lineaWorldIDAddress"), (address));
-        worldIDIdentityManagerAddress = abi.decode(vm.parseJson(json, ".worldIDIdentityManagerAddress"), (address));
+        bytes memory messageServiceJson = vm.parseJson(json, ".messageServiceAddressL1");
+        bytes memory lineaWorldIDJson = vm.parseJson(json, ".lineaWorldIDAddress");
+        bytes memory worldIDIdentityManagerJson = vm.parseJson(json, ".worldIDIdentityManagerAddress");
+
+        if (messageServiceJson.length != 32 || lineaWorldIDJson.length != 32 || worldIDIdentityManagerJson.length != 32)
+        {
+            console.log("Config Error: required addresses not set");
+            revert ConfigError();
+        }
+        messageServiceAddress = abi.decode(messageServiceJson, (address));
+        lineaWorldIDAddress = abi.decode(lineaWorldIDJson, (address));
+        worldIDIdentityManagerAddress = abi.decode(worldIDIdentityManagerJson, (address));
     }
 
     function run() external {
@@ -34,7 +45,7 @@ contract DeployLineaStateBridge is Script {
         // Check if lineaStateBridgeAddress is already in the JSON config
         bytes memory encodedAddress = vm.parseJson(json, ".lineaStateBridgeAddress");
 
-        if (encodedAddress.length > 0) {
+        if (encodedAddress.length == 32) {
             // If the address exists, load it
             address existingBridgeAddress = abi.decode(encodedAddress, (address));
             bridge = LineaStateBridge(existingBridgeAddress);

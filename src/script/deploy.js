@@ -7,7 +7,7 @@ import { Command } from "commander";
 import { execSync } from "child_process";
 
 // === Constants ==================================================================================
-const CONFIG_FILENAME = "src/script/.deploy-config.json";
+const CONFIG_FILENAME = "./config.json";
 const DEFAULT_RPC_URL = "http://localhost:8545";
 
 // === Implementation =============================================================================
