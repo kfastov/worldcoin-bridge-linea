@@ -18,6 +18,8 @@
     "@openzeppelin/contracts": "^4.9.6",
     "@openzeppelin/contracts-upgradeable": "^4.9.6",
     "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge#729d234",
+    "dotenv": "^16.0.3",
+    "yargs": "^17.7.2",
     "ethers": "^6.13.2",
     "linea-contracts": "github:Consensys/linea-contracts"
   },
@@ -47,6 +49,7 @@
     "prettier:write": "prettier --write \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
     "test": "forge test",
     "test:coverage": "forge coverage",
-    "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage"
+    "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage",
+    "propagate": "node src/script/propagateRoot.js"
   }
 }
