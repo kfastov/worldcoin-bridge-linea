@@ -27,12 +27,25 @@ const argv = yargs(hideBin(process.argv))
   .alias('help', 'h')
   .argv;
 
-const config = {
-  rpcUrl: argv.rpc || process.env.RPC_URL || 'https://rpc-sepolia.rockx.com',
-  lineaStateBridgeAddress: argv.address || process.env.LINEA_STATE_BRIDGE_ADDRESS,
-  propagationPeriod: argv.period || parseInt(process.env.PROPAGATION_PERIOD) || 3600000, 
-  privateKey: process.env.PRIVATE_KEY
-};
+  const config = {
+    rpcUrls: [
+      'https://ethereum-sepolia.publicnode.com',
+      'https://rpc.sepolia.org',
+      'https://api.zan.top/node/v1/eth/sepolia/public',
+      'https://1rpc.io/sepolia'
+      // Add more RPC URLs as needed
+    ],
+    currentRpcIndex: 0,
+    getRpcUrl: function() {
+      const url = this.rpcUrls[this.currentRpcIndex];
+      this.currentRpcIndex = (this.currentRpcIndex + 1) % this.rpcUrls.length;
+      return url;
+    },
+    lineaStateBridgeAddress: argv.address || process.env.LINEA_STATE_BRIDGE_ADDRESS,
+    propagationPeriod: argv.period || parseInt(process.env.PROPAGATION_PERIOD) || 3600000,
+    privateKey: process.env.PRIVATE_KEY
+  };
+  
 
 if (!config.privateKey) {
   console.error('PRIVATE_KEY not found in environment variables');

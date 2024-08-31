@@ -5,20 +5,26 @@ const LineaStateBridgeABI = [
   "function propagateRoot() external payable",
 ];
 
+const DEFAULT_LINEA_FEE = "0.001";
+
 class LineaRootPropagator {
   constructor(config) {
-    this.provider = new ethers.providers.JsonRpcProvider(config.rpcUrl);
-    this.wallet = new ethers.Wallet(config.privateKey, this.provider);
+    this.config = config;
+    this.initializeProvider();
     this.lineaStateBridge = new ethers.Contract(config.lineaStateBridgeAddress, LineaStateBridgeABI, this.wallet);
     this.propagationPeriod = config.propagationPeriod || 3600; // Default to 1 hour
     this.lineaSdk = new LineaSDK({ provider: this.provider });
     this.maxRetries = config.maxRetries || 3;
-    this.gasMultiplier = config.gasMultiplier || 1.5;
+    this.rpcTimeout = config.rpcTimeout || 10000; // 10 seconds default timeout
+  }
+
+  initializeProvider() {
+    this.provider = new ethers.providers.JsonRpcProvider(this.config.getRpcUrl(), undefined, { timeout: this.rpcTimeout });
+    this.wallet = new ethers.Wallet(this.config.privateKey, this.provider);
   }
 
   async getGasPrice() {
-    const gasPrice = await this.provider.getGasPrice();
-    return gasPrice.mul(Math.floor(this.gasMultiplier * 100)).div(100);
+    return await this.provider.getGasPrice();
   }
 
   async propagateRoot() {
@@ -30,7 +36,8 @@ class LineaRootPropagator {
         console.log(`Current gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} Gwei`);
 
         console.log('Estimating gas...');
-        const fee = ethers.utils.parseUnits("0.001", "ether")
+
+        const fee = ethers.utils.parseUnits(DEFAULT_LINEA_FEE, "ether");
         const gasLimit = await this.lineaStateBridge.estimateGas.propagateRoot({
           gasPrice: gasPrice,
           value: fee
@@ -50,18 +57,23 @@ class LineaRootPropagator {
         console.log(`Root propagated successfully. Transaction hash: ${receipt.transactionHash}`);
         return;
       } catch (error) {
-        console.error('Error propagating root:', error.message);
         if (error.code === 'INSUFFICIENT_FUNDS') {
-          console.log('Insufficient funds for gas. Please check your wallet balance.');
+          console.log('Error propagating root: Insufficient funds for gas. Please check your wallet balance.');
           return;
         }
-        if (error.code === 'UNPREDICTABLE_GAS_LIMIT' || error.message.includes('transaction underpriced')) {
+        if (error.code === 'UNPREDICTABLE_GAS_LIMIT') {
+          console.log('Insufficient Linea fee, please modify DEFAULT_LINEA_FEE value');
+          this.stop();
+          return;
+        }
+        if (error.code === 'TIMEOUT' || error.message.includes('timeout')) {
+          console.log('RPC timeout detected. Switching to next RPC URL...');
+          this.initializeProvider();
+          this.lineaStateBridge = new ethers.Contract(this.config.lineaStateBridgeAddress, LineaStateBridgeABI, this.wallet);
           retries++;
-          console.log(`Retry attempt ${retries}/${this.maxRetries}`);
-          this.gasMultiplier *= 1.2; // Increase gas price by 20% for each retry
-          await new Promise(resolve => setTimeout(resolve, 15000)); // Wait for 15 seconds before retrying
         } else {
           console.error('Unhandled error. Stopping propagation attempts.');
+          this.stop();
           return;
         }
       }
