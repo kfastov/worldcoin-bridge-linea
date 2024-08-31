@@ -17,7 +17,7 @@ contract MockMessageService is IMessageService {
     uint256 private _nonceCounter;
 
     /// @notice Mapping to keep track of claimed messages to prevent double claims.
-    mapping(bytes32 => bool) private _claimedMessages;
+    mapping(bytes32 message => bool claimed) private _claimedMessages;
 
     /**
      * @notice Sets the original sender address for mocking purposes.
