@@ -2,6 +2,7 @@
   "name": "@kfastov/worldcoin-bridge-linea",
   "description": "World ID state bridge for Linea",
   "version": "1.0.0",
+  "type": "module",
   "author": {
     "name": "Konstantin Fastov",
     "url": "https://github.com/kfastov"
@@ -13,7 +14,7 @@
     }
   ],
   "dependencies": {
-    "@consensys/linea-sdk": "^0.1.0",
+    "@consensys/linea-sdk": "^0.3.0",
     "@openzeppelin/contracts": "^4.9.6",
     "@openzeppelin/contracts-upgradeable": "^4.9.6",
     "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge#729d234",
