@@ -16,7 +16,7 @@ contract DeployLineaStateBridge is Script {
     ///                            CONFIG                           ///
     ///////////////////////////////////////////////////////////////////
     string public root = vm.projectRoot();
-    string public path = "./src/script/config.json";
+    string public path = "src/script/.deploy-config.json";
     string public json = vm.readFile(path);
 
     error ConfigError();

@@ -7,7 +7,7 @@ import { Command } from "commander";
 import { execSync } from "child_process";
 
 // === Constants ==================================================================================
-const CONFIG_FILENAME = "./src/script/config.json";
+const CONFIG_FILENAME = "src/script/.deploy-config.json";
 const DEFAULT_RPC_URL = "http://localhost:8545";
 const DEFAULT_TREE_DEPTH = 30;
 const DEFAULT_MESSENGER_L1 = "0xB218f8A4Bc926cF1cA7b3423c154a0D627Bdb7E5";
@@ -194,9 +194,18 @@ async function getWorldIDIdentityManagerAddress(config) {
 ///////////////////////////////////////////////////////////////////
 ///                            UTILS                            ///
 ///////////////////////////////////////////////////////////////////
-async function loadConfiguration(useConfig) {
+async function loadConfiguration(useConfig, environment) {
   if (!useConfig) {
     return {};
+  }
+  const defaultConfigFile = `src/script/config/default-${environment}-config.json`;
+  if (!fs.existsSync(CONFIG_FILENAME)) {
+    if (fs.existsSync(defaultConfigFile)) {
+      fs.copyFileSync(defaultConfigFile, CONFIG_FILENAME);
+      console.log(`Default configuration for ${environment} copied to ${CONFIG_FILENAME}`);
+    } else {
+      console.warn(`Default configuration file for ${environment} not found.`);
+    }
   }
   let answer = await ask(`Do you want to load configuration from prior runs? [Y/n]: `, "bool");
   const spinner = ora("Configuration Loading").start();
@@ -383,15 +392,17 @@ async function main() {
 
   program
     .name("deploy")
-    .description("A CLI interface for deploying the WorldID state bridge on Linea mainnet.")
-    .option("--no-config", "Do not use any existing configuration.");
+    .description("A CLI interface for deploying the WorldID state bridge on Linea.")
+    .option("--no-config", "Do not use any existing configuration.")
+    .option("--env <environment>", "Specify the environment (e.g., mainnet, sepolia)", "mainnet");
 
   program
     .command("deploy")
     .description("Interactively deploys the WorldID state bridge on Linea mainnet.")
     .action(async () => {
       const options = program.opts();
-      let config = await loadConfiguration(options.config);
+      const environment = options.env || "mainnet";
+      let config = await loadConfiguration(options.config, environment);
       await deploymentMainnet(config);
       await saveConfiguration(config);
     });

@@ -16,7 +16,7 @@ contract ManualClaim is Script {
     ///                            CONFIG                           ///
     ///////////////////////////////////////////////////////////////////
     string public root = vm.projectRoot();
-    string public path = "./config.json";
+    string public path = "src/script/.deploy-config.json";
     string public json = vm.readFile(path);
 
     function setUp() public {

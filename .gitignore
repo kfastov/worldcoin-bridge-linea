@@ -19,4 +19,4 @@ yarn.lock
 broadcast/*
 broadcast/*/31337/
 
-config.json
+.deploy-config.json
