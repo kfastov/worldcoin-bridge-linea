@@ -48,10 +48,10 @@ contract MockWorldIDIdentityManager is IWorldIDIdentityManager {
     ///        described by `preRoot`. Must be an element of the field `Kr`. (alread in reduced form)
     ///
     function registerIdentities(
-        uint256[8] calldata insertionProof,
+        uint256[8] calldata, /* insertionProof */
         uint256 preRoot,
-        uint32 startIndex,
-        uint256[] calldata identityCommitments,
+        uint32, /* startIndex */
+        uint256[] calldata, /* identityCommitments */
         uint256 postRoot
     )
         public
@@ -78,8 +78,8 @@ contract MockWorldIDIdentityManager is IWorldIDIdentityManager {
     /// @param postRoot The root obtained after deleting all of `identityCommitments` into the tree
     ///        described by `preRoot`. Must be an element of the field `Kr`.
     function deleteIdentities(
-        uint256[8] calldata deletionProof,
-        bytes calldata packedDeletionIndices,
+        uint256[8] calldata, /* deletionProof */
+        bytes calldata, /* packedDeletionIndices */
         uint256 preRoot,
         uint256 postRoot
     )
