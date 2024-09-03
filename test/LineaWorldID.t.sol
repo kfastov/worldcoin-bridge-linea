@@ -15,8 +15,8 @@ contract LineaWorldIDTest is PRBTest, StdCheats {
     MockMessageService public mockMessageService;
     address public messageServiceAddress;
 
-    uint8 constant TREE_DEPTH = 30;
-    address constant OWNER = address(0x1234);
+    uint8 internal constant TREE_DEPTH = 30;
+    address internal constant OWNER = address(0x1234);
 
     ///////////////////////////////////////////////////////////////////
     ///                            ERRORS                           ///
