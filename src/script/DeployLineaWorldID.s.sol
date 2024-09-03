@@ -29,12 +29,12 @@ contract DeployLineaWorldID is Script {
         vm.startBroadcast(privateKey);
 
         // Check if lineaWorldIdAddress is already in the JSON config
-        bytes memory encodedAddress = vm.parseJson(json, ".lineaWorldIDAddress");
+        bytes memory lineaWorldIDAddressJson = vm.parseJson(json, ".lineaWorldIDAddress");
 
-        if (encodedAddress.length > 0) {
+        if (lineaWorldIDAddressJson.length == 32) {
+            address lineaWorldIDAddress = abi.decode(bytes(lineaWorldIDAddressJson), (address));
             // If the address exists, load it
-            address existingWorldIdAddress = abi.decode(encodedAddress, (address));
-            lineaWorldId = LineaWorldID(existingWorldIdAddress);
+            lineaWorldId = LineaWorldID(lineaWorldIDAddress);
             console.log("Loaded existing LineaWorldID at:", address(lineaWorldId));
         } else {
             // If the address doesn't exist, deploy a new contract
