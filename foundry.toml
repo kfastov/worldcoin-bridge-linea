@@ -1,0 +1,42 @@
+# Full reference https://github.com/foundry-rs/foundry/tree/master/crates/config
+
+[profile.default]
+auto_detect_solc = false
+block_timestamp = 1_680_220_800                     # March 31, 2023 at 00:00 GMT
+bytecode_hash = "none"
+evm_version = "shanghai"
+fuzz = { runs = 1_000 }
+gas_reports = ["*"]
+optimizer = true
+optimizer_runs = 10_000
+out = "out"
+script = "script"
+solc = "0.8.19"
+src = "src"
+test = "test"
+fs_permissions = [{ access = "read-write", path = "src/script/.deploy-config.json" }]
+
+[profile.ci]
+fuzz = { runs = 10_000 }
+verbosity = 4
+
+# [etherscan]
+# mainnet = { key = "${API_KEY_ETHERSCAN}" }
+# sepolia = { key = "${API_KEY_ETHERSCAN}" }
+
+[fmt]
+bracket_spacing = true
+int_types = "long"
+line_length = 120
+multiline_func_header = "all"
+number_underscore = "thousands"
+quote_style = "double"
+tab_width = 4
+wrap_comments = true
+
+[rpc_endpoints]
+sepolia = "https://sepolia.infura.io/v3/${API_KEY_INFURA}"
+mainnet = "https://mainnet.infura.io/v3/${API_KEY_INFURA}"
+linea_sepolia = "https://linea-sepolia.infura.io/v3/${API_KEY_INFURA}"
+linea_mainnet = "https://linea-mainnet.infura.io/v3/${API_KEY_INFURA}"
+localhost = "http://localhost:8545"
