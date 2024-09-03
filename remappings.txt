@@ -1,5 +1,6 @@
 @openzeppelin/contracts/=node_modules/@openzeppelin/contracts/
-@openzeppelin/contracts-upgradeable/=node_modules/@openzeppelin/contracts-upgradeable
-forge-std/=node_modules/forge-std/src
-world-id-state-bridge=node_modules/@worldcoin/world-id-state-bridge/src
-linea-contracts/=node_modules/linea-contracts/contracts
+@openzeppelin/contracts-upgradeable/=node_modules/@openzeppelin/contracts-upgradeable/
+forge-std/=node_modules/forge-std/src/
+world-id-state-bridge/=node_modules/@worldcoin/world-id-state-bridge/src/
+linea-contracts/=node_modules/linea-contracts/contracts/
+@prb/test/=node_modules/@prb/test/src/
