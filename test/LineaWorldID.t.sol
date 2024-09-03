@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import { LineaWorldID } from "../src/LineaWorldID.sol";
-import { IMessageService } from "linea-contracts/interfaces/IMessageService.sol";
 import { MockMessageService } from "../src/mocks/MockMessageService.sol";
 
 import { PRBTest } from "@prb/test/PRBTest.sol";
