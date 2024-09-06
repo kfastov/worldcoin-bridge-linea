@@ -13,7 +13,7 @@ import { StdCheats } from "forge-std/StdCheats.sol";
 /// @notice A test contract for LineaStateBridge.sol
 contract LineaStateBridgeTest is PRBTest, StdCheats {
     uint256 public mainnetFork;
-    string private MAINNET_RPC_URL = vm.envString("MAINNET_RPC_URL");
+    string private mainnetRPCUrl = vm.envString("MAINNET_RPC_URL");
 
     LineaStateBridge public lineaStateBridge;
     MockWorldIDIdentityManager public mockWorldID;
@@ -91,7 +91,7 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
     error AddressZero();
 
     function setUp() public {
-        mainnetFork = vm.createFork(MAINNET_RPC_URL);
+        mainnetFork = vm.createFork(mainnetRPCUrl);
         vm.selectFork(mainnetFork);
 
         // Deploy mock contracts
@@ -135,7 +135,7 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
     /// @notice Tests that the owner of the StateBridge contract can transfer ownership
     /// using Ownable2Step transferOwnership
     /// @param newOwner the new owner of the contract
-    function test_owner_transferOwnership_succeeds(address newOwner, bool isLocal) public {
+    function test_owner_transferOwnership_succeeds(address newOwner) public {
         vm.assume(newOwner != address(0));
 
         vm.expectEmit(true, true, true, true);
