@@ -50,13 +50,12 @@ contract LineaStateBridge is Ownable2Step {
     /// of the LineaWorldID contract to the WorldID Identity Manager contract
     /// @param previousRemoteAddress The previous authorized remote sender for the LineaWorldID contract
     /// @param remoteAddress The authorized remote sender address, cannot be empty
-    event UpdatedRemoteAddressLinea(address indexed previousRemoteAddress, address indexed remoteAddress);
+    event OwnershipTransferredLinea(address indexed previousRemoteAddress, address indexed remoteAddress, bool isLocal);
 
     /// @notice Emitted when the StateBridge changes message service address
     /// of the LineaWorldID contract
-    /// @param previousMessageService The previous message service address for the LineaWorldID contract
     /// @param messageService The message service address, cannot be empty.
-    event UpdatedMessageServiceLinea(address indexed previousMessageService, address indexed messageService);
+    event MessageServiceUpdatedLinea(address indexed messageService);
 
     /// @notice Emitted when the StateBridge sends a root to the LineaWorldID contract
     /// @param root The root sent to the LineaWorldID contract on Linea
@@ -122,8 +121,8 @@ contract LineaStateBridge is Ownable2Step {
     ///                          PUBLIC API                         ///
     ///////////////////////////////////////////////////////////////////
 
-    /// @notice Sends the latest WorldID Identity Manager root to the ILineaStack.
-    /// @dev Calls this method on the L1 Proxy contract to relay roots to Linea
+    /// @notice Sends the latest WorldID Identity Manager root to the World ID contract on Linea.
+    /// @dev Uses the Linea message service to relay the latest root to the LineaWorldID contract on L2
     function propagateRoot() external payable {
         uint256 latestRoot = IWorldIDIdentityManager(worldIDAddress).latestRoot();
 
@@ -158,12 +157,12 @@ contract LineaStateBridge is Ownable2Step {
             lineaWorldIDAddress, _feeTransferOwnership, message
         );
 
-        emit UpdatedRemoteAddressLinea(owner(), _owner);
+        emit OwnershipTransferredLinea(owner(), _owner, _isLocal);
     }
 
     /// @notice Sets or updates the message service
     /// @param _messageService The new message service address, cannot be empty.
-    function setMessageService(address _messageService) public payable onlyOwner {
+    function setMessageServiceLinea(address _messageService) public payable onlyOwner {
         if (_messageService == address(0)) {
             revert AddressZero();
         }
@@ -176,7 +175,7 @@ contract LineaStateBridge is Ownable2Step {
             lineaWorldIDAddress, _feeSetMessageService, message
         );
 
-        emit UpdatedMessageServiceLinea(owner(), _messageService);
+        emit MessageServiceUpdatedLinea(_messageService);
     }
 
     /// @notice Adds functionality to the StateBridge to set the root history expiry on LineaWorldID
@@ -221,9 +220,9 @@ contract LineaStateBridge is Ownable2Step {
         emit SetFeeTransferOwnershipLinea(_lineaFee);
     }
 
-    /// @notice Sets the fee for the setMessageService method
-    /// @param _lineaFee The new fee for the setMessageService method
-    function setFeeSetMessageService(uint256 _lineaFee) external onlyOwner {
+    /// @notice Sets the fee for the setMessageServiceLinea method
+    /// @param _lineaFee The new fee for the setMessageServiceLinea method
+    function setFeeSetMessageServiceLinea(uint256 _lineaFee) external onlyOwner {
         _feeSetMessageService = _lineaFee;
         emit SetFeeSetMessageService(_lineaFee);
     }

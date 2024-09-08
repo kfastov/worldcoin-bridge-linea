@@ -18,8 +18,6 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
     LineaStateBridge public lineaStateBridge;
     MockWorldIDIdentityManager public mockWorldID;
 
-    uint32 public lineaGasLimit;
-
     address public mockWorldIDAddress;
 
     address public owner;
@@ -47,18 +45,12 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
     /// of the LineaWorldID contract to the WorldID Identity Manager contract
     /// @param previousRemoteAddress The previous authorized remote sender for the LineaWorldID contract
     /// @param remoteAddress The authorized remote sender address, cannot be empty
-    event UpdatedRemoteAddressLinea(address indexed previousRemoteAddress, address indexed remoteAddress);
+    event OwnershipTransferredLinea(address indexed previousRemoteAddress, address indexed remoteAddress, bool isLocal);
 
     /// @notice Emitted when the StateBridge changes message service address
     /// of the LineaWorldID contract
-    /// @param previousMessageService The previous message service address for the LineaWorldID contract
     /// @param messageService The message service address, cannot be empty.
-    event UpdatedMessageServiceLinea(address indexed previousMessageService, address indexed messageService);
-
-    /// @notice Emitted when the message service is set or updated
-    /// @param oldMessageService The old message service address.
-    /// @param newMessageService The new message service address.
-    event MessageServiceUpdated(address indexed oldMessageService, address indexed newMessageService);
+    event MessageServiceUpdatedLinea(address indexed messageService);
 
     /// @notice Emitted when the StateBridge sends a root to the LineaWorldID contract
     /// @param root The root sent to the LineaWorldID contract on Linea
@@ -123,7 +115,7 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         assertEq(vm.activeFork(), mainnetFork);
     }
 
-    function test_propagateRoot_suceeds() public {
+    function test_propagateRoot_succeeds() public {
         vm.expectEmit(true, true, true, true);
         emit RootPropagated(sampleRoot);
 
@@ -159,7 +151,7 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         vm.assume(newOwner != address(0));
         vm.expectEmit(true, true, true, true);
 
-        emit UpdatedRemoteAddressLinea(owner, newOwner);
+        emit OwnershipTransferredLinea(owner, newOwner, isLocal);
 
         vm.prank(owner);
         lineaStateBridge.transferOwnershipLinea(newOwner, isLocal);
@@ -171,10 +163,10 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         vm.assume(_messageService != address(0));
         vm.expectEmit(true, true, true, true);
 
-        emit UpdatedMessageServiceLinea(owner, _messageService);
+        emit MessageServiceUpdatedLinea(_messageService);
 
         vm.prank(owner);
-        lineaStateBridge.setMessageService(_messageService);
+        lineaStateBridge.setMessageServiceLinea(_messageService);
     }
 
     /// @notice tests whether the StateBridge contract can set root history expiry on Linea
@@ -190,8 +182,6 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
     /// @notice tests whether the StateBridge contract can set fee for propagateRoot
     /// @param _lineaFee The new lineaFee for SetRootHistoryExpiry
     function test_owner_setFeePropagateRoot_succeeds(uint32 _lineaFee) public {
-        vm.assume(_lineaFee != 0);
-
         vm.expectEmit(true, true, true, true);
 
         emit SetFeePropagateRoot(_lineaFee);
@@ -227,7 +217,7 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
     }
 
     /// @notice tests whether the StateBridge contract can set fee for SetRootHistoryExpiry
-    /// @param _lineaFee The new lineaFee for setMessageService
+    /// @param _lineaFee The new lineaFee for setMessageServiceLinea
     function test_owner_setFeeSetMessageService_succeeds(uint32 _lineaFee) public {
         vm.assume(_lineaFee != 0);
 
@@ -236,7 +226,7 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         emit SetFeeSetMessageService(_lineaFee);
 
         vm.prank(owner);
-        lineaStateBridge.setFeeSetMessageService(_lineaFee);
+        lineaStateBridge.setFeeSetMessageServiceLinea(_lineaFee);
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -324,6 +314,6 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         vm.expectRevert(AddressZero.selector);
 
         vm.prank(owner);
-        lineaStateBridge.setMessageService(address(0));
+        lineaStateBridge.setMessageServiceLinea(address(0));
     }
 }
