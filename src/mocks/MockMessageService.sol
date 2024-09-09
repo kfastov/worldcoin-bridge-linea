@@ -19,6 +19,9 @@ contract MockMessageService is IMessageService {
     /// @notice Mapping to keep track of claimed messages to prevent double claims.
     mapping(bytes32 message => bool claimed) private _claimedMessages;
 
+    /// @notice The minimal fee for the message service
+    uint256 private constant MINIMAL_FEE = 1;
+
     /**
      * @notice Sets the original sender address for mocking purposes.
      * @param _sender The address to set as the original sender.
@@ -36,11 +39,10 @@ contract MockMessageService is IMessageService {
      * @param _calldata The calldata used by the destination message service to call the destination contract.
      */
     function sendMessage(address _to, uint256 _fee, bytes calldata _calldata) external payable override {
-        if (msg.value < _fee) {
+        if (msg.value < MINIMAL_FEE) {
             revert FeeTooLow();
         }
-        if (msg.value < _fee + 1) {
-            // Assuming 1 wei as the minimum value for testing purposes
+        if (msg.value < _fee) {
             revert ValueSentTooLow();
         }
 

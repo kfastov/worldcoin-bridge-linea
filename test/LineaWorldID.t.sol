@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import { LineaWorldID } from "../src/LineaWorldID.sol";
 import { MockMessageService } from "../src/mocks/MockMessageService.sol";
+import { WorldIDBridge } from "world-id-state-bridge/abstract/WorldIDBridge.sol";
 
 import { PRBTest } from "@prb/test/PRBTest.sol";
 import { StdCheats } from "forge-std/StdCheats.sol";
@@ -24,10 +25,6 @@ contract LineaWorldIDTest is PRBTest, StdCheats {
 
     /// @notice Emitted when attempting to validate a root that has expired.
     error ExpiredRoot();
-
-    /// @notice Emitted when attempting to validate a root that has yet to be added to the root
-    ///         history.
-    error NonExistentRoot();
 
     /// @notice Emitted when attempting to update the timestamp for a root that already has one.
     error CannotOverwriteRoot();
@@ -211,7 +208,12 @@ contract LineaWorldIDTest is PRBTest, StdCheats {
     )
         public
     {
-        vm.expectRevert(NonExistentRoot.selector);
+        // Zero root will pass "valid root validation" in WorldIDBridge.sol because it is the same as the latest
+        // (initial) root
+        // Then it will revert because the proof is not valid for the given root
+        vm.assume(root != 0);
+
+        vm.expectRevert(WorldIDBridge.NonExistentRoot.selector);
         lineaWorldID.verifyProof(root, signalHash, nullifierHash, externalNullifierHash, proof);
     }
 }

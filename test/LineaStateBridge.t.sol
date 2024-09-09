@@ -119,7 +119,8 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         vm.expectEmit(true, true, true, true);
         emit RootPropagated(sampleRoot);
 
-        lineaStateBridge.propagateRoot();
+        // Send with value to pay for the message service
+        lineaStateBridge.propagateRoot{ value: 1 }();
 
         // Bridging is not emulated
     }
@@ -154,7 +155,8 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         emit OwnershipTransferredLinea(owner, newOwner, isLocal);
 
         vm.prank(owner);
-        lineaStateBridge.transferOwnershipLinea(newOwner, isLocal);
+        // Send with value to pay for the message service
+        lineaStateBridge.transferOwnershipLinea{ value: 1 }(newOwner, isLocal);
     }
 
     /// @notice tests whether the StateBridge contract can updates the message service
@@ -166,7 +168,8 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         emit MessageServiceUpdatedLinea(_messageService);
 
         vm.prank(owner);
-        lineaStateBridge.setMessageServiceLinea(_messageService);
+        // Send with value to pay for the message service
+        lineaStateBridge.setMessageServiceLinea{ value: 1 }(_messageService);
     }
 
     /// @notice tests whether the StateBridge contract can set root history expiry on Linea
@@ -176,7 +179,8 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         emit SetRootHistoryExpiry(_rootHistoryExpiry);
 
         vm.prank(owner);
-        lineaStateBridge.setRootHistoryExpiry(_rootHistoryExpiry);
+        // Send with value to pay for the message service
+        lineaStateBridge.setRootHistoryExpiry{ value: 1 }(_rootHistoryExpiry);
     }
 
     /// @notice tests whether the StateBridge contract can set fee for propagateRoot
