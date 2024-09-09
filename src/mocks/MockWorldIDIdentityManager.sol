@@ -40,10 +40,6 @@ contract MockWorldIDIdentityManager is IWorldIDIdentityManager {
     ///        and 7 are the `x` and `y` coordinates for `krs`.
     /// @param preRoot The value for the root of the tree before the `identityCommitments` have been
     ////       inserted. Must be an element of the field `Kr`. (already in reduced form)
-    /// @param startIndex The position in the tree at which the insertions were made.
-    /// @param identityCommitments The identities that were inserted into the tree starting at
-    ///        `startIndex` and `preRoot` to give `postRoot`. All of the commitments must be
-    ///        elements of the field `Kr`.
     /// @param postRoot The root obtained after inserting all of `identityCommitments` into the tree
     ///        described by `preRoot`. Must be an element of the field `Kr`. (alread in reduced form)
     ///
