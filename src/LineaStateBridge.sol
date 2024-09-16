@@ -91,6 +91,9 @@ contract LineaStateBridge is Ownable2Step {
     /// @notice Emitted when an attempt is made to set an address to zero
     error AddressZero();
 
+    /// @notice Emitted when the incorrect message fee is sent
+    error IncorrectMessageFeeSent();
+
     ///////////////////////////////////////////////////////////////////
     ///                         CONSTRUCTOR                         ///
     ///////////////////////////////////////////////////////////////////
@@ -126,6 +129,11 @@ contract LineaStateBridge is Ownable2Step {
     function propagateRoot() external payable {
         uint256 latestRoot = IWorldIDIdentityManager(worldIDAddress).latestRoot();
 
+        // Ensure that the correct fee is sent with the transaction
+        if (msg.value != _feePropagateRoot) {
+            revert IncorrectMessageFeeSent();
+        }
+
         // The `encodeCall` function is strongly typed, so this checks that we are passing the
         // correct data to the Linea message service.
         bytes memory message = abi.encodeCall(ILineaWorldID.receiveRoot, (latestRoot));
@@ -149,6 +157,11 @@ contract LineaStateBridge is Ownable2Step {
             revert AddressZero();
         }
 
+        // Ensure that the correct fee is sent with the transaction
+        if (msg.value != _feeTransferOwnership) {
+            revert IncorrectMessageFeeSent();
+        }
+
         // Encoding the call to transferOwnership on ICrossDomainOwnableLinea
         bytes memory message = abi.encodeCall(ICrossDomainOwnableLinea.transferOwnership, (_owner, _isLocal));
 
@@ -167,6 +180,11 @@ contract LineaStateBridge is Ownable2Step {
             revert AddressZero();
         }
 
+        // Ensure that the correct fee is sent with the transaction
+        if (msg.value != _feeSetMessageService) {
+            revert IncorrectMessageFeeSent();
+        }
+
         // Encoding the call to setMessageService on ICrossDomainOwnableLinea
         bytes memory message = abi.encodeCall(ICrossDomainOwnableLinea.setMessageService, (_messageService));
 
@@ -181,6 +199,11 @@ contract LineaStateBridge is Ownable2Step {
     /// @notice Adds functionality to the StateBridge to set the root history expiry on LineaWorldID
     /// @param _rootHistoryExpiry new root history expiry
     function setRootHistoryExpiry(uint256 _rootHistoryExpiry) external payable onlyOwner {
+        // Ensure that the correct fee is sent with the transaction
+        if (msg.value != _feeSetRootHistoryExpiry) {
+            revert IncorrectMessageFeeSent();
+        }
+
         // The `encodeCall` function is strongly typed, so this checks that we are passing the
         // correct data to the linea bridge.
         bytes memory message = abi.encodeCall(IRootHistory.setRootHistoryExpiry, (_rootHistoryExpiry));

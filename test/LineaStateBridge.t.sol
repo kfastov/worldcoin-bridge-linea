@@ -101,6 +101,12 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         lineaStateBridge =
             new LineaStateBridge(mockWorldIDAddress, lineaWorldIDAddress, lineaCrossDomainMessengerAddress);
 
+        // Set fee for every action to 1
+        lineaStateBridge.setFeePropagateRoot(1);
+        lineaStateBridge.setFeeSetRootHistoryExpiry(1);
+        lineaStateBridge.setFeeTransferOwnershipLinea(1);
+        lineaStateBridge.setFeeSetMessageServiceLinea(1);
+
         owner = lineaStateBridge.owner();
     }
 
