@@ -22,7 +22,7 @@
     "dotenv": "^16.0.3",
     "yargs": "^17.7.2",
     "ethers": "^6.13.2",
-    "linea-contracts": "github:Consensys/linea-contracts"
+    "linea-monorepo": "github:Consensys/linea-monorepo#e63c730"
   },
   "devDependencies": {
     "forge-std": "github:foundry-rs/forge-std#v1.8.1",
