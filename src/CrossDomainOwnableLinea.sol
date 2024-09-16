@@ -11,8 +11,8 @@ import { IMessageService } from "linea-contracts/interfaces/IMessageService.sol"
 abstract contract CrossDomainOwnableLinea is Ownable {
     IMessageService public messageService;
 
-    /// @notice If true, the contract uses the cross domain _checkOwner function override.
-    ///         If false it uses the standard Ownable _checkOwner function.
+    /// @notice If true, the owner is on the same layer as this contract (L2).
+    ///         If false, the owner is on a different layer (L1) and ownership checks use cross-layer messaging.
     bool public isLocal = true;
 
     /// @notice Emits when ownership of the contract is transferred. Includes the
