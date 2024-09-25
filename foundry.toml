@@ -20,6 +20,25 @@ fs_permissions = [{ access = "read-write", path = "src/script/.deploy-config.jso
 fuzz = { runs = 10_000 }
 verbosity = 4
 
+# === Test All Profile ========================================================
+
+[profile.bench]
+# We make the optimiser run a lot more for production, hoping to reduce our gas
+# costs.
+optimizer_runs = 20000
+
+# Make things chattier when debugging in case of test failures, giving us more
+# information with which to debug the issue. At this level, stack traces for
+# failing tests are displayed.
+verbosity = 3
+
+# We can specify the contracts to track gas data for by tracing.
+gas_reports = [
+  "WorldIDIdentityManager",
+  "MockWorldIDIdentityManager",
+  "Verifier",
+]
+
 # [etherscan]
 # mainnet = { key = "${API_KEY_ETHERSCAN}" }
 # sepolia = { key = "${API_KEY_ETHERSCAN}" }
