@@ -4,8 +4,8 @@
 
 ## Description
 
-State bridge between the WorldID Ethereum mainnet deployment and Linea. The [spec](./docs/spec.md)
-can be found in `docs/spec.md`.
+State bridge between the WorldID Ethereum mainnet deployment and Linea. The [spec](./docs/spec.md) can be found in
+`docs/spec.md`.
 
 ## Deployments
 
@@ -14,11 +14,15 @@ The addresses of the contract deployments for production and staging can be foun
 
 ## Supported Networks
 
-This repository implements a World ID state bridge specifically for Linea. For context, the original World ID state bridge supports Polygon PoS and OP stack chains (Optimism and Base), which can be found [here](https://github.com/worldcoin/world-id-state-bridge). Additionally, there's a standalone bridge similar to this one for Scroll, available [here](https://github.com/dragan2234/worldcoin-scroll-bridge).
+This repository implements a World ID state bridge specifically for Linea. For context, the original World ID state
+bridge supports Polygon PoS and OP stack chains (Optimism and Base), which can be found
+[here](https://github.com/worldcoin/world-id-state-bridge). Additionally, there's a standalone bridge similar to this
+one for Scroll, available [here](https://github.com/dragan2234/worldcoin-scroll-bridge).
 
 ## Prerequisites
 
-This repository uses Bun as a dependency manager, script execution environment and so on. To install Bun, refer to its [webpage](https://bun.sh/docs/installation). Other commands listed below assume you have Bun installed.
+This repository uses Bun as a dependency manager, script execution environment and so on. To install Bun, refer to its
+[webpage](https://bun.sh/docs/installation). Other commands listed below assume you have Bun installed.
 
 ## Documentation
 
@@ -97,7 +101,6 @@ Run the tests:
 $ forge test
 ```
 
-
 ### Deploy
 
 Deploy to Anvil:
@@ -111,7 +114,6 @@ For this script to work, you need to have a `MNEMONIC` environment variable set 
 
 For instructions on how to deploy to a testnet or mainnet, check out the
 [Solidity Scripting](https://book.getfoundry.sh/tutorials/solidity-scripting.html) tutorial.
-
 
 ## Contributing
 
