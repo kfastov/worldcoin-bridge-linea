@@ -1,21 +1,41 @@
-# World ID State Bridge for Linea
+# worldcoin-bridge-linea
+
+![spec](docs/state-bridge.svg)
 
 ## Description
 
-This repository will contain the code for the Worldcoin state bridge, specifically designed for the Linea blockchain.
-The bridge facilitates state synchronization between the WorldID Ethereum mainnet deployment and the Linea network.
+State bridge between the WorldID Ethereum mainnet deployment and Linea. The [spec](./docs/spec.md)
+can be found in `docs/spec.md`.
 
 ## Deployments
 
-The addresses of the contract deployments for production and staging will be available in docs/deployments.md.
+The addresses of the contract deployments for production and staging can be found in
+[`docs/deployments.md`](./docs/deployments.md#production).
 
 ## Supported Networks
 
-- Linea (zkEVM Layer 2 on Ethereum)
+This repository implements a World ID state bridge specifically for Linea. For context, the original World ID state bridge supports Polygon PoS and OP stack chains (Optimism and Base), which can be found [here](https://github.com/worldcoin/world-id-state-bridge). Additionally, there's a standalone bridge similar to this one for Scroll, available [here](https://github.com/dragan2234/worldcoin-scroll-bridge).
+
+## Prerequisites
+
+This repository uses Bun as a dependency manager, script execution environment and so on. To install Bun, refer to its [webpage](https://bun.sh/docs/installation). Other commands listed below assume you have Bun installed.
+
+## Documentation
+
+Run `bun doc` to build and deploy a simple documentation webpage on [localhost:3000](https://localhost:3000). Uses
+[`forge doc`](https://book.getfoundry.sh/reference/forge/forge-doc#forge-doc) under the hood and sources information
+from the `world-id-state-bridge` contracts [NatSpec](https://docs.soliditylang.org/en/latest/natspec-format.html)
+documentation.
 
 ## Usage
 
 This is a list of the most frequently needed commands.
+
+### Install Dependencies
+
+```sh
+bun install
+```
 
 ### Build
 
@@ -33,42 +53,20 @@ Delete the build artifacts and cache directories:
 $ forge clean
 ```
 
-### Compile
-
-Compile the contracts:
-
-```sh
-$ forge build
-```
-
 ### Coverage
 
-Get a test coverage report:
+Generate test coverage and output result to the terminal:
 
 ```sh
-$ forge coverage
+$ bun run test:coverage
 ```
-
-### Deploy
-
-Deploy to Anvil:
-
-```sh
-$ forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8545
-```
-
-For this script to work, you need to have a `MNEMONIC` environment variable set to a valid
-[BIP39 mnemonic](https://iancoleman.io/bip39/).
-
-For instructions on how to deploy to a testnet or mainnet, check out the
-[Solidity Scripting](https://book.getfoundry.sh/tutorials/solidity-scripting.html) tutorial.
 
 ### Format
 
-Format the contracts:
+Format the contracts with `forge fmt` and the rest of the files (.js, .md) with Prettier:
 
 ```sh
-$ forge fmt
+bun run format
 ```
 
 ### Gas Usage
@@ -76,7 +74,11 @@ $ forge fmt
 Get a gas report:
 
 ```sh
-$ forge test --gas-report
+bun run snapshot
+```
+
+```sh
+bun run bench
 ```
 
 ### Lint
@@ -95,18 +97,21 @@ Run the tests:
 $ forge test
 ```
 
-Generate test coverage and output result to the terminal:
+
+### Deploy
+
+Deploy to Anvil:
 
 ```sh
-$ bun run test:coverage
+$ forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8545
 ```
 
-Generate test coverage with lcov report (you'll have to open the `./coverage/index.html` file in your browser, to do so
-simply copy paste the path):
+For this script to work, you need to have a `MNEMONIC` environment variable set to a valid
+[BIP39 mnemonic](https://iancoleman.io/bip39/).
 
-```sh
-$ bun run test:coverage:report
-```
+For instructions on how to deploy to a testnet or mainnet, check out the
+[Solidity Scripting](https://book.getfoundry.sh/tutorials/solidity-scripting.html) tutorial.
+
 
 ## Contributing
 
