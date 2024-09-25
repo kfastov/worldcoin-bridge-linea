@@ -81,6 +81,8 @@ Get a gas report:
 bun run snapshot
 ```
 
+Run gas benchmarks on the tests:
+
 ```sh
 bun run bench
 ```
