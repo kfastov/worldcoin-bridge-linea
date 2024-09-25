@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import readline from "readline";
 
 import dotenv from "dotenv";
@@ -10,12 +11,14 @@ import { execSync } from "child_process";
 const CONFIG_FILENAME = "src/script/.deploy-config.json";
 const DEFAULT_RPC_URL = "http://localhost:8545";
 const DEFAULT_TREE_DEPTH = 30;
-const DEFAULT_MESSENGER_L1 = "0xB218f8A4Bc926cF1cA7b3423c154a0D627Bdb7E5";
-const DEFAULT_MESSENGER_L2 = "0x971e727e956690b9957be6d51Ec16E73AcAC83A7";
-const DEFAULT_WORLD_ID_MANAGER = "0x928a514350A403e2f5e3288C102f6B1CCABeb37C";
 const addressRegex = /0x[a-fA-F0-9]{40}/;
 
 // === Implementation =============================================================================
+
+function loadEnvFile(environment) {
+  const envFile = path.resolve(process.cwd(), `${environment}.env`);
+  dotenv.config({ path: envFile });
+}
 
 /**
  * Asks the user a question and returns the answer.
@@ -82,25 +85,19 @@ async function getPrivateKey(config) {
 
 async function getMessageServiceAddressL1(config) {
   if (!config.messageServiceAddressL1) {
-    config.messageServiceAddressL1 = process.env.MESSENGER_SERVICE_ADDRESS_L1;
+    config.messageServiceAddressL1 = process.env.MESSAGE_SERVICE_ADDRESS_L1;
   }
   if (!config.messageServiceAddressL1) {
-    config.messageServiceAddressL1 = await ask(`Enter L1 message service address: (${DEFAULT_MESSENGER_L1}) `);
-  }
-  if (!config.messageServiceAddressL1) {
-    config.messageServiceAddressL1 = DEFAULT_MESSENGER_L1;
+    config.messageServiceAddressL1 = await ask("Enter L1 message service address: ");
   }
 }
 
 async function getMessageServiceAddressL2(config) {
   if (!config.messageServiceAddressL2) {
-    config.messageServiceAddressL2 = process.env.MESSENGER_SERVICE_ADDRESS_L2;
+    config.messageServiceAddressL2 = process.env.MESSAGE_SERVICE_ADDRESS_L2;
   }
   if (!config.messageServiceAddressL2) {
-    config.messageServiceAddressL2 = await ask(`Enter L2 message service address: (${DEFAULT_MESSENGER_L2}) `);
-  }
-  if (!config.messageServiceAddressL2) {
-    config.messageServiceAddressL2 = DEFAULT_MESSENGER_L2;
+    config.messageServiceAddressL2 = await ask("Enter L2 message service address: ");
   }
 }
 
@@ -182,30 +179,16 @@ async function getWorldIDIdentityManagerAddress(config) {
     config.worldIDIdentityManagerAddress = process.env.WORLD_ID_IDENTITY_MANAGER_ADDRESS;
   }
   if (!config.worldIDIdentityManagerAddress) {
-    config.worldIDIdentityManagerAddress = await ask(
-      `Enter WorldID Identity Manager Address: (${DEFAULT_WORLD_ID_MANAGER}) `,
-    );
-  }
-  if (!config.worldIDIdentityManagerAddress) {
-    config.worldIDIdentityManagerAddress = DEFAULT_WORLD_ID_MANAGER;
+    config.worldIDIdentityManagerAddress = await ask("Enter WorldID Identity Manager Address: ");
   }
 }
 
 ///////////////////////////////////////////////////////////////////
 ///                            UTILS                            ///
 ///////////////////////////////////////////////////////////////////
-async function loadConfiguration(useConfig, environment) {
+async function loadConfiguration(useConfig) {
   if (!useConfig) {
     return {};
-  }
-  const defaultConfigFile = `src/script/config/default-${environment}-config.json`;
-  if (!fs.existsSync(CONFIG_FILENAME)) {
-    if (fs.existsSync(defaultConfigFile)) {
-      fs.copyFileSync(defaultConfigFile, CONFIG_FILENAME);
-      console.log(`Default configuration for ${environment} copied to ${CONFIG_FILENAME}`);
-    } else {
-      console.warn(`Default configuration file for ${environment} not found.`);
-    }
   }
   let answer = await ask(`Do you want to load configuration from prior runs? [Y/n]: `, "bool");
   const spinner = ora("Configuration Loading").start();
@@ -274,7 +257,7 @@ export function parseJson(data) {
 ///////////////////////////////////////////////////////////////////
 
 async function deployLineaWorldID(config) {
-  const spinner = ora("Deploying LineaID on Linea...").start();
+  const spinner = ora("Deploying LineaWorldID on Linea...").start();
 
   try {
     let command = `forge script src/script/DeployLineaWorldID.s.sol:DeployLineaWorldID --fork-url ${config.lineaRpcUrl} --broadcast --json`;
@@ -356,7 +339,7 @@ async function InitializeLineaWorldID(config) {
 ///                     SCRIPT ORCHESTRATION                    ///
 ///////////////////////////////////////////////////////////////////
 
-async function deploymentMainnet(config) {
+async function deployment(config) {
   dotenv.config();
   try {
     await getPrivateKey(config);
@@ -402,8 +385,12 @@ async function main() {
     .action(async () => {
       const options = program.opts();
       const environment = options.env || "mainnet";
+
+      console.log("Loading environment:", environment);
+      loadEnvFile(environment);
       let config = await loadConfiguration(options.config, environment);
-      await deploymentMainnet(config);
+
+      await deployment(config);
       await saveConfiguration(config);
     });
 
