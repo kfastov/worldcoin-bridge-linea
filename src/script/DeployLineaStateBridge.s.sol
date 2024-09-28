@@ -42,22 +42,8 @@ contract DeployLineaStateBridge is Script {
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(privateKey);
 
-        // Check if lineaStateBridgeAddress is already in the JSON config
-        bytes memory encodedAddress = vm.parseJson(json, ".lineaStateBridgeAddress");
-
-        if (encodedAddress.length == 32) {
-            // If the address exists, load it
-            address existingBridgeAddress = abi.decode(encodedAddress, (address));
-            bridge = LineaStateBridge(existingBridgeAddress);
-            console.log("Loaded existing LineaStateBridge at:", address(bridge));
-        } else {
-            // If the address doesn't exist, deploy a new contract
-            bridge = new LineaStateBridge(worldIDIdentityManagerAddress, lineaWorldIDAddress, messageServiceAddress);
-            console.log("Deployed new LineaStateBridge at:", address(bridge));
-
-            // Store the deployed address in the config JSON
-            vm.writeJson(vm.toString(address(bridge)), path, ".lineaStateBridgeAddress");
-        }
+        bridge = new LineaStateBridge(worldIDIdentityManagerAddress, lineaWorldIDAddress, messageServiceAddress);
+        console.log("Deployed new LineaStateBridge at:", address(bridge));
 
         vm.stopBroadcast();
     }

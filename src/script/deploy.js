@@ -125,18 +125,18 @@ async function getLineaRpcUrl(config) {
   }
 }
 
-async function getEthereumEtherscanApiKey(config) {
-  if (!config.ethereumEtherscanApiKey) {
-    config.ethereumEtherscanApiKey = process.env.ETHERSCAN_API_KEY;
+async function getEtherscanApiKey(config) {
+  if (!config.etherscanApiKey) {
+    config.etherscanApiKey = process.env.ETHERSCAN_API_KEY;
   }
-  if (!config.ethereumEtherscanApiKey) {
-    config.ethereumEtherscanApiKey = await ask(
+  if (!config.etherscanApiKey) {
+    config.etherscanApiKey = await ask(
       `Enter Ethereum Etherscan API KEY: (https://etherscan.io/myaccount) (Leave it empty for mocks) `,
     );
   }
 }
 
-async function getLineaEtherscanApiKey(config) {
+async function getLineaScanApiKey(config) {
   if (!config.lineaScanApiKey) {
     config.lineaScanApiKey = process.env.LINEA_SCAN_API_KEY;
   }
@@ -144,6 +144,15 @@ async function getLineaEtherscanApiKey(config) {
     config.lineaScanApiKey = await ask(
       `Enter Lineascan API KEY: (https://lineascan.build/myaccount) (Leave it empty for mocks) `,
     );
+  }
+}
+
+async function getLineaScanVerifierUrl(config) {
+  if (!config.lineaScanVerifierUrl) {
+    config.lineaScanVerifierUrl = process.env.LINEA_SCAN_VERIFIER_URL;
+  }
+  if (!config.lineaScanVerifierUrl) {
+    config.lineaScanVerifierUrl = await ask("Enter Lineascan Verifier URL: ");
   }
 }
 
@@ -259,27 +268,45 @@ export function parseJson(data) {
 async function deployLineaWorldID(config) {
   const spinner = ora("Deploying LineaWorldID on Linea...").start();
 
+  // Check if lineaWorldIDAddress is already in the JSON config
+  if (config.lineaWorldIDAddress) {
+    spinner.succeed(`LineaWorldID already deployed at ${config.lineaWorldIDAddress}`);
+    return;
+  }
+
   try {
     let command = `forge script src/script/DeployLineaWorldID.s.sol:DeployLineaWorldID --fork-url ${config.lineaRpcUrl} --broadcast --json`;
-    if (config.lineaEtherscanApiKey) {
-      command += ` --etherscan-api-key ${config.lineaEtherscanApiKey} --verify`;
-    }
     const output = execSync(command);
     const data = output.toString();
     const jsonData = parseJson(data);
     if (jsonData.success) {
       for (const log of jsonData.logs) {
         if (!log.includes("LineaWorldID")) continue;
-        const match = data.match(addressRegex);
+        const match = log.match(addressRegex);
         if (!match) continue;
         const contractAddress = match[0];
         config.lineaWorldIDAddress = contractAddress;
       }
     }
-    spinner.succeed("DeployLineaWorldID.s.sol ran successfully!");
+    spinner.succeed(`LineaWorldID deployed successfully at ${config.lineaWorldIDAddress}`);
   } catch (err) {
-    spinner.fail("DeployLineaWorldID.s.sol failed!");
+    spinner.fail("Failed to deploy LineaWorldID!");
     throw err;
+  }
+}
+
+// Can't verify and deploy at the same time due to https://github.com/foundry-rs/foundry/issues/7466
+async function verifyLineaWorldID(config) {
+  const spinner = ora("Verifying LineaWorldID on Linea...").start();
+
+  try {
+    let command = `forge verify-contract ${config.lineaWorldIDAddress} src/LineaWorldID.sol:LineaWorldID --etherscan-api-key ${config.lineaScanApiKey} --verifier-url ${config.lineaScanVerifierUrl} --watch`;
+    console.log(command);
+    const output = execSync(command);
+    console.log(output);
+    spinner.succeed("Verify LineaWorldID ran successfully!");
+  } catch (err) {
+    spinner.fail("Verify LineaWorldID failed!");
   }
 }
 
@@ -287,13 +314,19 @@ async function deployLineaWorldID(config) {
 ///                      MAINNET DEPLOYMENT                     ///
 ///////////////////////////////////////////////////////////////////
 
-async function deployLineaStateBridgeMainnet(config) {
-  const spinner = ora("Deploying Linea State Bridge...").start();
+async function deployLineaStateBridge(config) {
+  const spinner = ora("Deploying Linea State Bridge on Ethereum...").start();
+
+  // Check if lineaStateBridgeAddress is already in the JSON config
+  if (config.lineaStateBridgeAddress) {
+    spinner.succeed(`LineaStateBridge already deployed at ${config.lineaStateBridgeAddress}`);
+    return;
+  }
 
   try {
     let command = `forge script src/script/DeployLineaStateBridge.s.sol:DeployLineaStateBridge --fork-url ${config.ethereumRpcUrl} --broadcast -vvvv --json`;
-    if (config.ethereumEtherscanApiKey) {
-      command += ` --etherscan-api-key ${config.lineaEtherscanApiKey} --verify`;
+    if (config.etherscanApiKey) {
+      command += ` --etherscan-api-key ${config.etherscanApiKey} --verify`;
     }
     const output = execSync(command);
     const data = output.toString();
@@ -301,15 +334,15 @@ async function deployLineaStateBridgeMainnet(config) {
     if (jsonData.success) {
       for (const log of jsonData.logs) {
         if (!log.includes("LineaStateBridge")) continue;
-        const match = data.match(addressRegex);
+        const match = log.match(addressRegex);
         if (!match) continue;
         const contractAddress = match[0];
         config.lineaStateBridgeAddress = contractAddress;
       }
     }
-    spinner.succeed("DeployLineaStateBridge.s.sol ran successfully!");
+    spinner.succeed(`LineaStateBridge deployed successfully at ${config.lineaStateBridgeAddress}`);
   } catch (err) {
-    spinner.fail("DeployLineaStateBridge.s.sol failed!");
+    spinner.fail("Failed to deploy LineaStateBridge!");
     throw err;
   }
 }
@@ -319,7 +352,7 @@ async function deployLineaStateBridgeMainnet(config) {
 ///////////////////////////////////////////////////////////////////
 
 async function InitializeLineaWorldID(config) {
-  const spinner = ora("Initializing LineaWorldId...").start();
+  const spinner = ora("Changing LineaWorldId ownership...").start();
 
   try {
     const data = execSync(
@@ -327,10 +360,10 @@ async function InitializeLineaWorldID(config) {
     );
     const jsonData = parseJson(data.toString());
     if (jsonData.success) {
-      spinner.succeed("InitializeLineaStateBridge.s.sol ran successfully!");
+      spinner.succeed("LineaWorldID ownership transferred to LineaStateBridge on L1");
     }
   } catch (err) {
-    spinner.fail("InitializeLineaStateBridge.s.sol failed!");
+    spinner.fail("Failed to transfer ownership of LineaWorldID to LineaStateBridge on L1");
     throw err;
   }
 }
@@ -345,18 +378,22 @@ async function deployment(config) {
     await getPrivateKey(config);
     await getEthereumRpcUrl(config);
     await getLineaRpcUrl(config);
-    await getEthereumEtherscanApiKey(config);
-    await getLineaEtherscanApiKey(config);
+    await getEtherscanApiKey(config);
+    await getLineaScanApiKey(config);
+    await getLineaScanVerifierUrl(config);
     await getTreeDepth(config);
     await getMessageServiceAddressL1(config);
     await getMessageServiceAddressL2(config);
     await saveConfiguration(config);
     await deployLineaWorldID(config);
     await saveConfiguration(config);
+    if (config.etherscanApiKey) {
+      await verifyLineaWorldID(config);
+    }
     await getWorldIDIdentityManagerAddress(config);
     await getLineaWorldIDAddress(config);
     await saveConfiguration(config);
-    await deployLineaStateBridgeMainnet(config);
+    await deployLineaStateBridge(config);
     await saveConfiguration(config);
     await getLineaStateBridgeAddress(config);
     await saveConfiguration(config);
