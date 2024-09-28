@@ -54,6 +54,8 @@
     "snapshot": "FOUNDRY_PROFILE=bench forge snapshot",
     "bench": "FOUNDRY_PROFILE=bench forge test --gas-report",
     "propagate": "node src/script/propagateRoot.js",
-    "doc": "forge doc --build; forge doc --serve -p 3000"
+    "doc": "forge doc --build; forge doc --serve -p 3000",
+    "deploy": "bun run src/script/deploy.js deploy",
+    "deploy:testnet": "bun run src/script/deploy.js deploy --env sepolia"
   }
 }
