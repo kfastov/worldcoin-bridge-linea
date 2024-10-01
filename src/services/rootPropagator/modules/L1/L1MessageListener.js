@@ -14,28 +14,48 @@ export async function listenForL1Messages() {
   const l1MessageServiceContract = new ethers.Contract(config.l1MessageServiceAddress, abi, provider);
 
   const filter = l1MessageServiceContract.filters.MessageSent(config.lineaStateBridgeAddress);
-  
-  l1MessageServiceContract.on(filter, async (payload) => {
-    logger.info(`MessageSent Event Detected:`);
-    const [_from, _to, _fee, _value, nonce, calldata, messageHash] = payload.args;
-    logger.info(`Message details`, {
-      nonce,
-      messageHash,
-      calldata,
-      blockNumber: payload.log.blockNumber,
-      transactionHash: payload.log.transactionHash
-    });
 
-    try {
-      await saveMessage({
-        messageHash: messageHash,
-        nonce: nonce,
-        calldata: calldata,
-      });
-    } catch (error) {
-      logger.error('Error saving message to database:', { error: error.message });
-    }
+  // Process past events
+  const latestBlock = await provider.getBlockNumber();
+  const blocksToQuery = config.l1BlocksToQuery || 100000; // Default to 100,000 blocks if not specified
+  const fromBlock = Math.max(0, latestBlock - blocksToQuery);
+  logger.info(`Querying past events from block ${fromBlock} to ${latestBlock}`);
+
+  const pastEvents = await l1MessageServiceContract.queryFilter(filter, fromBlock, latestBlock);
+  logger.info(`Found ${pastEvents.length} past events`);
+
+  for (const event of pastEvents) {
+    await processEvent(event);
+  }
+
+  // Set up listener for new events
+  l1MessageServiceContract.on(filter, async (event) => {
+    await processEvent(event);
   });
 
-  logger.info('L1 Message Listener started');
+  logger.info('L1 Message Listener started for new events');
+}
+
+async function processEvent(event) {
+  const [_from, to, fee, value, nonce, calldata, messageHash] = event.args;
+  logger.info('Processing MessageSent Event', {
+    nonce,
+    messageHash,
+  });
+
+  try {
+    await saveMessage({
+      destination: to,
+      messageHash: messageHash,
+      nonce: nonce.toString(),
+      fee: fee.toString(),
+      value: value.toString(),
+      calldata: calldata,
+      status: 'pending',
+      blockNumber: event.blockNumber,
+      transactionHash: event.transactionHash
+    });
+  } catch (error) {
+    logger.error('Error saving message to database:', { error: error.message, messageHash });
+  }
 }

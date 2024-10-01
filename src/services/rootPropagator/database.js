@@ -28,11 +28,11 @@ export async function saveMessage(messageData) {
   });
 }
 
-export async function getUnconfirmedMessages() {
+export async function getUnclaimedMessages() {
   return new Promise((resolve, reject) => {
-    db.find({ status: 'pending' }, (err, docs) => {
+    db.find({ status: 'confirmed' }, (err, docs) => {
       if (err) {
-        console.error('Failed to get unconfirmed messages:', err);
+        console.error('Failed to get unclaimed messages:', err);
         reject(err);
       } else {
         resolve(docs);
@@ -55,14 +55,14 @@ export async function updateMessageStatus(messageHash, status) {
   });
 }
 
-export async function deleteConfirmedMessages() {
+export async function deleteClaimedMessages() {
   return new Promise((resolve, reject) => {
-    db.remove({ status: 'confirmed' }, { multi: true }, (err, numRemoved) => {
+    db.remove({ status: 'claimed' }, { multi: true }, (err, numRemoved) => {
       if (err) {
-        console.error('Failed to delete confirmed messages:', err);
+        console.error('Failed to delete claimed messages:', err);
         reject(err);
       } else {
-        console.log(`Deleted ${numRemoved} confirmed messages`);
+        console.log(`Deleted ${numRemoved} claimed messages`);
         resolve(numRemoved);
       }
     });
