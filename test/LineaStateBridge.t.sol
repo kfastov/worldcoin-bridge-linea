@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
 import { LineaStateBridge } from "../src/LineaStateBridge.sol";
@@ -12,6 +13,7 @@ import { StdCheats } from "forge-std/StdCheats.sol";
 /// @author Worldcoin & IkemHood
 /// @notice A test contract for LineaStateBridge.sol
 contract LineaStateBridgeTest is PRBTest, StdCheats {
+    uint256 constant MESSAGE_RELAY_FEE = 1;
     uint256 public mainnetFork;
     string private mainnetRPCUrl = vm.envString("MAINNET_RPC_URL");
 
@@ -102,10 +104,10 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
             new LineaStateBridge(mockWorldIDAddress, lineaWorldIDAddress, lineaCrossDomainMessengerAddress);
 
         // Set fee for every action to 1
-        lineaStateBridge.setFeePropagateRoot(1);
-        lineaStateBridge.setFeeSetRootHistoryExpiry(1);
-        lineaStateBridge.setFeeTransferOwnershipLinea(1);
-        lineaStateBridge.setFeeSetMessageServiceLinea(1);
+        lineaStateBridge.setFeePropagateRoot(MESSAGE_RELAY_FEE);
+        lineaStateBridge.setFeeSetRootHistoryExpiry(MESSAGE_RELAY_FEE);
+        lineaStateBridge.setFeeTransferOwnershipLinea(MESSAGE_RELAY_FEE);
+        lineaStateBridge.setFeeSetMessageServiceLinea(MESSAGE_RELAY_FEE);
 
         owner = lineaStateBridge.owner();
     }
@@ -129,6 +131,16 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         lineaStateBridge.propagateRoot{ value: 1 }();
 
         // Bridging is not emulated
+    }
+
+    function test_propagateRoot_fails_with_incorrect_fee() public {
+        // Test with less than the correct fee
+        vm.expectRevert(LineaStateBridge.IncorrectMessageFeeSent.selector);
+        lineaStateBridge.propagateRoot{ value: MESSAGE_RELAY_FEE - 1 }();
+
+        // Test with more than the correct fee
+        vm.expectRevert(LineaStateBridge.IncorrectMessageFeeSent.selector);
+        lineaStateBridge.propagateRoot{ value: MESSAGE_RELAY_FEE + 1 }();
     }
 
     /// @notice Tests that the owner of the StateBridge contract can transfer ownership
@@ -165,6 +177,22 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         lineaStateBridge.transferOwnershipLinea{ value: 1 }(newOwner, isLocal);
     }
 
+    /// @notice tests that transferOwnershipLinea reverts when incorrect fee is sent
+    /// @param newOwner The new owner of the lineaWorldID contract (foundry fuzz)
+    /// @param isLocal Whether the ownership transfer is local (Linea EOA/contract) or an Ethereum EOA or contract
+    function test_transferOwnershipLinea_fails_with_incorrect_fee(address newOwner, bool isLocal) public {
+        vm.assume(newOwner != address(0));
+        vm.prank(owner);
+        // Test with less than the correct fee
+        vm.expectRevert(LineaStateBridge.IncorrectMessageFeeSent.selector);
+        lineaStateBridge.transferOwnershipLinea{ value: MESSAGE_RELAY_FEE - 1 }(newOwner, isLocal);
+
+        vm.prank(owner);
+        // Test with more than the correct fee
+        vm.expectRevert(LineaStateBridge.IncorrectMessageFeeSent.selector);
+        lineaStateBridge.transferOwnershipLinea{ value: MESSAGE_RELAY_FEE + 1 }(newOwner, isLocal);
+    }
+
     /// @notice tests whether the StateBridge contract can updates the message service
     /// @param _messageService The new message service address
     function test_owner_setMessageService_succeeds(address _messageService) public {
@@ -178,6 +206,22 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         lineaStateBridge.setMessageServiceLinea{ value: 1 }(_messageService);
     }
 
+    /// @notice tests that setMessageServiceLinea reverts when incorrect fee is sent
+    /// @param _messageService The new message service address
+    function test_setMessageServiceLinea_fails_with_incorrect_fee(address _messageService) public {
+        vm.assume(_messageService != address(0));
+
+        vm.prank(owner);
+        // Test with less than the correct fee
+        vm.expectRevert(LineaStateBridge.IncorrectMessageFeeSent.selector);
+        lineaStateBridge.setMessageServiceLinea{ value: MESSAGE_RELAY_FEE - 1 }(_messageService);
+
+        vm.prank(owner);
+        // Test with more than the correct fee
+        vm.expectRevert(LineaStateBridge.IncorrectMessageFeeSent.selector);
+        lineaStateBridge.setMessageServiceLinea{ value: MESSAGE_RELAY_FEE + 1 }(_messageService);
+    }
+
     /// @notice tests whether the StateBridge contract can set root history expiry on Linea
     /// @param _rootHistoryExpiry The new root history expiry for LineaWorldID
     function test_owner_setRootHistoryExpiry_succeeds(uint256 _rootHistoryExpiry) public {
@@ -187,6 +231,20 @@ contract LineaStateBridgeTest is PRBTest, StdCheats {
         vm.prank(owner);
         // Send with value to pay for the message service
         lineaStateBridge.setRootHistoryExpiry{ value: 1 }(_rootHistoryExpiry);
+    }
+
+    /// @notice tests that setRootHistoryExpiry reverts when incorrect fee is sent
+    /// @param _rootHistoryExpiry The new root history expiry for LineaWorldID
+    function test_setRootHistoryExpiry_fails_with_incorrect_fee(uint256 _rootHistoryExpiry) public {
+        vm.prank(owner);
+        // Test with less than the correct fee
+        vm.expectRevert(LineaStateBridge.IncorrectMessageFeeSent.selector);
+        lineaStateBridge.setRootHistoryExpiry{ value: MESSAGE_RELAY_FEE - 1 }(_rootHistoryExpiry);
+
+        vm.prank(owner);
+        // Test with more than the correct fee
+        vm.expectRevert(LineaStateBridge.IncorrectMessageFeeSent.selector);
+        lineaStateBridge.setRootHistoryExpiry{ value: MESSAGE_RELAY_FEE + 1 }(_rootHistoryExpiry);
     }
 
     /// @notice tests whether the StateBridge contract can set fee for propagateRoot

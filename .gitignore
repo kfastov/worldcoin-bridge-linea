@@ -6,6 +6,8 @@ out
 
 # files
 *.env
+!mainnet.env
+!sepolia.env
 *.log
 .DS_Store
 .pnp.*

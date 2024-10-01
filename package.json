@@ -48,9 +48,14 @@
     "lint:sol": "forge fmt --check && bun solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
     "prettier:write": "prettier --write \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
+    "format": "forge fmt; npx prettier --write \"**/*.{js,json,md,yml}\" --ignore-path \".prettierignore\"",
     "test": "forge test",
     "test:coverage": "forge coverage",
-    "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage",
-    "propagate": "node src/script/propagateRoot.js"
+    "snapshot": "FOUNDRY_PROFILE=bench forge snapshot",
+    "bench": "FOUNDRY_PROFILE=bench forge test --gas-report",
+    "propagate": "node src/script/propagateRoot.js",
+    "doc": "forge doc --build; forge doc --serve -p 3000",
+    "deploy": "bun run src/script/deploy.js deploy",
+    "deploy:testnet": "bun run src/script/deploy.js deploy --env sepolia"
   }
 }
