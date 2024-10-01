@@ -34,3 +34,4 @@ contract DeployLineaWorldID is Script {
         vm.stopBroadcast();
     }
 }
+
