@@ -102,18 +102,21 @@ export async function claimL2Messages() {
 
   for (const message of unclaimedMessages) {
     try {
-        console.log('Claiming message', { messageHash: message.messageHash });
-        console.log('message contents', {
-            messageSender: config.lineaStateBridgeAddress,
-            destination: message.destination,
-            fee: message.fee,
-            value: message.value,
-            messageNonce: message.nonce,
-            calldata: message.calldata,
-            messageHash: message.messageHash
-          });
+      logger.info('Claiming message', { messageHash: message.messageHash });
+
+      const status = await l2Contract.getMessageStatus(message.messageHash);
+
+      if (status === 'CLAIMED') {
+        logger.info('Message already claimed', { messageHash: message.messageHash });
+        await updateMessageStatus(message.messageHash, 'claimed');
+        continue;
+      } else if (status !== 'CLAIMABLE') {
+        logger.error('Message status is not claimable', { messageHash: message.messageHash, status });
+        continue;
+      }
+
       const tx = await l2Contract.claim({
-        messageSender: config.lineaStateBridgeAddress,
+        messageSender: message.messageSender,
         destination: message.destination,
         fee: message.fee,
         value: message.value,
@@ -126,9 +129,13 @@ export async function claimL2Messages() {
       logger.info('Message claimed successfully', { messageHash: message.messageHash });
       await updateMessageStatus(message.messageHash, 'claimed');
     } catch (error) {
-      logger.error('Error claimed message', { messageHash: message.messageHash, error: error.message });
+      if (error.message.includes('0x6650c4d1')) {
+        logger.warn('Message claim failed due to CannotOverwriteRoot error', { messageHash: message.messageHash });
+        await updateMessageStatus(message.messageHash, 'failed');
+      } else {
+        logger.error('Error claiming message', { messageHash: message.messageHash, error: error.message });
+      }
     }
-    // break // process only one message for now
   }
 
   // Clean up claimed messages

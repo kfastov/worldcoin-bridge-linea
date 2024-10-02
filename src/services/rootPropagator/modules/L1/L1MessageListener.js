@@ -37,7 +37,7 @@ export async function listenForL1Messages() {
 }
 
 async function processEvent(event) {
-  const [_from, to, fee, value, nonce, calldata, messageHash] = event.args;
+  const [from, to, fee, value, nonce, calldata, messageHash] = event.args;
   logger.info('Processing MessageSent Event', {
     nonce,
     messageHash,
@@ -45,6 +45,7 @@ async function processEvent(event) {
 
   try {
     await saveMessage({
+      messageSender: from,
       destination: to,
       messageHash: messageHash,
       nonce: nonce.toString(),
