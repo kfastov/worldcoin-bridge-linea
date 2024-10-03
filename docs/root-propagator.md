@@ -31,11 +31,11 @@ The service aims to:
 ## Required Environment Variables
 
 - `PRIVATE_KEY`: For transaction signing.
-- `L1_RPC_URL`: Ethereum L1 RPC URL.
-- `L2_RPC_URL`: Linea L2 RPC URL.
+- `ETH_RPC_URL`: Ethereum L1 RPC URL.
+- `LINEA_RPC_URL`: Linea L2 RPC URL.
 - `LINEA_STATE_BRIDGE_ADDRESS`: LineaStateBridge contract address on L1.
-- `L1_MESSAGE_SERVICE_ADDRESS`: L1 Message Service contract address.
-- `L2_MESSAGE_SERVICE_ADDRESS`: L2 Message Service contract address.
+- `MESSAGE_SERVICE_ADDRESS_L1`: L1 Message Service contract address.
+- `MESSAGE_SERVICE_ADDRESS_L2`: L2 Message Service contract address.
 - `WORLD_ID_IDENTITY_MANAGER_ADDRESS`: WorldID Identity Manager contract address on L1.
 - `LINEA_WORLD_ID_ADDRESS`: LineaWorldID contract address on L2.
 
@@ -45,6 +45,9 @@ Optional variables (with defaults) include:
 - `L1_BLOCKS_TO_QUERY`: Number of L1 blocks to query for events (default: 1000).
 - `L2_BLOCKS_TO_QUERY`: Number of L2 blocks to query for events (default: 1000).
 - `L2_POLLING_INTERVAL`: Interval for polling L2 for new blocks (default: 15 seconds).
+- `LINEA_NETWORK`: Linea network name (default: "linea-mainnet").
+
+It also supports a special `ENVIRONMENT` variable to load environment-specific variables from the corresponding `.env` file.
 
 ## Security Note
 

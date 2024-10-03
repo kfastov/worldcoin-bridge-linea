@@ -1,5 +1,14 @@
 import dotenv from 'dotenv';
 import { ethers } from 'ethers';
+import fs from 'fs';
+
+// Load environment-specific file if ENVIRONMENT is set
+if (process.env.ENVIRONMENT) {
+  const envFile = `${process.env.ENVIRONMENT}.env`;
+  if (fs.existsSync(envFile)) {
+    dotenv.config({ path: envFile });
+  }
+}
 
 dotenv.config();
 
@@ -9,11 +18,11 @@ const config = {
   l1BlocksToQuery: parseInt(process.env.L1_BLOCKS_TO_QUERY) || 100000, // Default to 100,000 blocks
   l2BlocksToQuery: parseInt(process.env.L2_BLOCKS_TO_QUERY) || 100000, // Default to 100,000 blocks
   privateKey: process.env.PRIVATE_KEY,
-  l1RpcUrl: process.env.L1_RPC_URL,
-  l2RpcUrl: process.env.L2_RPC_URL,
+  l1RpcUrl: process.env.ETH_RPC_URL,
+  l2RpcUrl: process.env.LINEA_RPC_URL,
   lineaStateBridgeAddress: process.env.LINEA_STATE_BRIDGE_ADDRESS,
-  l1MessageServiceAddress: process.env.L1_MESSAGE_SERVICE_ADDRESS,
-  l2MessageServiceAddress: process.env.L2_MESSAGE_SERVICE_ADDRESS,
+  l1MessageServiceAddress: process.env.MESSAGE_SERVICE_ADDRESS_L1,
+  l2MessageServiceAddress: process.env.MESSAGE_SERVICE_ADDRESS_L2,
   l2PollingInterval: parseInt(process.env.L2_POLLING_INTERVAL) || 30000, // Default to 30 seconds
   worldIDIdentityManagerAddress: process.env.WORLD_ID_IDENTITY_MANAGER_ADDRESS,
   lineaWorldIDAddress: process.env.LINEA_WORLD_ID_ADDRESS,

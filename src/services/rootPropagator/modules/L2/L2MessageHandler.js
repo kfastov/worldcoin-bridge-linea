@@ -92,7 +92,7 @@ export async function claimL2Messages() {
   const lineaSDK = new LineaSDK({
     l2RpcUrl: config.l2RpcUrl,
     l2SignerPrivateKey: config.privateKey,
-    network: "linea-sepolia", // TODO: make this dynamic based on environment
+    network: config.lineaNetwork, // Use the network from config
     mode: "read-write",
   });
 

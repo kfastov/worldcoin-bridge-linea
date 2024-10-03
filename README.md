@@ -10,7 +10,7 @@ State bridge between the WorldID Ethereum mainnet deployment and Linea. The [spe
 ## Deployments
 
 The addresses of the contract deployments for production and staging can be found in
-[`docs/deployments.md`](./docs/deployments.md#production).
+[`docs/deployments.md`](./docs/deployments.md).
 
 ## Supported Networks
 
@@ -116,6 +116,14 @@ For this script to work, you need to have a `MNEMONIC` environment variable set 
 
 For instructions on how to deploy to a testnet or mainnet, check out the
 [Solidity Scripting](https://book.getfoundry.sh/tutorials/solidity-scripting.html) tutorial.
+
+### Run Root Propagator
+
+To run the root propagator on testnet:
+```sh
+$ bun run propagator:testnet
+```
+You can read more about the root propagator [here](./docs/root-propagator.md).
 
 ## Contributing
 

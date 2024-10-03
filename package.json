@@ -58,6 +58,9 @@
     "propagate": "node src/script/propagateRoot.js",
     "doc": "forge doc --build; forge doc --serve -p 3000",
     "deploy": "bun run src/script/deploy.js deploy",
-    "deploy:testnet": "bun run src/script/deploy.js deploy --env sepolia"
+    "deploy:testnet": "bun run src/script/deploy.js deploy --env sepolia",
+    "deploy:mainnet": "bun run src/script/deploy.js deploy --env mainnet",
+    "propagator:mainnet": "ENVIRONMENT=mainnet bun run src/services/rootPropagator/app.js",
+    "propagator:testnet": "ENVIRONMENT=sepolia bun run src/services/rootPropagator/app.js"
   }
 }
