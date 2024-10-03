@@ -4,23 +4,26 @@ import { createModuleLogger } from '../../utils/logger.js';
 
 const logger = createModuleLogger('LineaRootPropagator');
 
-const LineaStateBridgeABI = [
-  "function propagateRoot() external payable",
+const LineaWorldIDABI = [
   "function latestRoot() public view returns (uint256)",
 ];
 
 const WorldIDIdentityManagerABI = [
-  "event TreeChanged(uint256 indexed preRoot, TreeChange indexed kind, uint256 indexed postRoot)",
+  "event TreeChanged(uint256 indexed preRoot, uint8 indexed kind, uint256 indexed postRoot)",
+];
+
+const LineaStateBridgeABI = [
+  "function propagateRoot() external payable",
 ];
 
 const DEFAULT_LINEA_FEE = "0";
 
 export async function checkL2ContractState() {
   const provider = new ethers.JsonRpcProvider(config.l2RpcUrl);
-  const lineaStateBridge = new ethers.Contract(config.lineaStateBridgeAddress, LineaStateBridgeABI, provider);
+  const lineaWorldIDContract = new ethers.Contract(config.lineaWorldIDAddress, LineaWorldIDABI, provider);
 
   try {
-    const latestRoot = await lineaStateBridge.latestRoot();
+    const latestRoot = await lineaWorldIDContract.latestRoot();
     logger.info(`Latest root in L2 contract: ${latestRoot}`);
     return latestRoot === ethers.ZeroHash;
   } catch (error) {

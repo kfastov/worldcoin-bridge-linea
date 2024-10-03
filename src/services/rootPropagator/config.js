@@ -16,6 +16,7 @@ const config = {
   l2MessageServiceAddress: process.env.L2_MESSAGE_SERVICE_ADDRESS,
   l2PollingInterval: parseInt(process.env.L2_POLLING_INTERVAL) || 30000, // Default to 30 seconds
   worldIDIdentityManagerAddress: process.env.WORLD_ID_IDENTITY_MANAGER_ADDRESS,
+  lineaWorldIDAddress: process.env.LINEA_WORLD_ID_ADDRESS,
 };
 
 export function validateConfig() {
@@ -27,6 +28,7 @@ export function validateConfig() {
     'l1MessageServiceAddress',
     'l2MessageServiceAddress',
     'worldIDIdentityManagerAddress',
+    'lineaWorldIDAddress',
   ];
 
   for (const field of requiredFields) {
@@ -36,7 +38,7 @@ export function validateConfig() {
   }
 
   // Validate Ethereum addresses
-  const addressFields = ['lineaStateBridgeAddress', 'l1MessageServiceAddress', 'l2MessageServiceAddress', 'worldIDIdentityManagerAddress'];
+  const addressFields = ['lineaStateBridgeAddress', 'l1MessageServiceAddress', 'l2MessageServiceAddress', 'worldIDIdentityManagerAddress', 'lineaWorldIDAddress'];
   for (const field of addressFields) {
     if (!ethers.isAddress(config[field])) {
       throw new Error(`Invalid Ethereum address for ${field}: ${config[field]}`);
