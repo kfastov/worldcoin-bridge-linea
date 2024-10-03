@@ -20,9 +20,11 @@
     "@prb/test": "^0.6.4",
     "@worldcoin/world-id-state-bridge": "github:worldcoin/world-id-state-bridge#729d234",
     "dotenv": "^16.0.3",
-    "yargs": "^17.7.2",
     "ethers": "^6.13.2",
-    "linea-monorepo": "github:Consensys/linea-monorepo#e63c730"
+    "linea-monorepo": "github:Consensys/linea-monorepo#e63c730",
+    "nedb": "^1.8.0",
+    "node-cron": "^3.0.3",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "forge-std": "github:foundry-rs/forge-std#v1.8.1",
@@ -56,6 +58,9 @@
     "propagate": "node src/script/propagateRoot.js",
     "doc": "forge doc --build; forge doc --serve -p 3000",
     "deploy": "bun run src/script/deploy.js deploy",
-    "deploy:testnet": "bun run src/script/deploy.js deploy --env sepolia"
+    "deploy:testnet": "bun run src/script/deploy.js deploy --env sepolia",
+    "deploy:mainnet": "bun run src/script/deploy.js deploy --env mainnet",
+    "propagator:mainnet": "ENVIRONMENT=mainnet bun run src/services/rootPropagator/app.js",
+    "propagator:testnet": "ENVIRONMENT=sepolia bun run src/services/rootPropagator/app.js"
   }
 }
