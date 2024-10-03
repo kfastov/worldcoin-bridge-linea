@@ -6,9 +6,40 @@ const logger = createModuleLogger('LineaRootPropagator');
 
 const LineaStateBridgeABI = [
   "function propagateRoot() external payable",
+  "function latestRoot() public view returns (uint256)",
+];
+
+const WorldIDIdentityManagerABI = [
+  "event TreeChanged(uint256 indexed preRoot, TreeChange indexed kind, uint256 indexed postRoot)",
 ];
 
 const DEFAULT_LINEA_FEE = "0";
+
+export async function checkL2ContractState() {
+  const provider = new ethers.JsonRpcProvider(config.l2RpcUrl);
+  const lineaStateBridge = new ethers.Contract(config.lineaStateBridgeAddress, LineaStateBridgeABI, provider);
+
+  try {
+    const latestRoot = await lineaStateBridge.latestRoot();
+    logger.info(`Latest root in L2 contract: ${latestRoot}`);
+    return latestRoot === ethers.ZeroHash;
+  } catch (error) {
+    logger.error('Error checking L2 contract state:', { error: error.message });
+    throw error;
+  }
+}
+
+export async function setupTreeChangedListener() {
+  const provider = new ethers.JsonRpcProvider(config.l1RpcUrl);
+  const worldIDIdentityManager = new ethers.Contract(config.worldIDIdentityManagerAddress, WorldIDIdentityManagerABI, provider);
+
+  worldIDIdentityManager.on("TreeChanged", async (preRoot, kind, postRoot) => {
+    logger.info('TreeChanged event detected', { preRoot, kind, postRoot });
+    await propagateRoot();
+  });
+
+  logger.info('TreeChanged event listener set up successfully');
+}
 
 export async function propagateRoot() {
   const provider = new ethers.JsonRpcProvider(config.l1RpcUrl);
