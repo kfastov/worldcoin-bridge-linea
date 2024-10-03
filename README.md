@@ -105,17 +105,11 @@ $ forge test
 
 ### Deploy
 
-Deploy to Anvil:
+To deploy the contracts to the testnet:
 
 ```sh
-$ forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8545
+$ bun run deploy:testnet
 ```
-
-For this script to work, you need to have a `MNEMONIC` environment variable set to a valid
-[BIP39 mnemonic](https://iancoleman.io/bip39/).
-
-For instructions on how to deploy to a testnet or mainnet, check out the
-[Solidity Scripting](https://book.getfoundry.sh/tutorials/solidity-scripting.html) tutorial.
 
 ### Run Root Propagator
 
