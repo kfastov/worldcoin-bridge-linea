@@ -10,6 +10,7 @@ fuzz = { runs = 1_000 }
 gas_reports = ["*"]
 optimizer = true
 optimizer_runs = 10_000
+libs = ['node_modules']
 out = "out"
 script = "script"
 solc = "0.8.19"
