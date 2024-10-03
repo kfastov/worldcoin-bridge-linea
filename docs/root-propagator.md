@@ -2,7 +2,8 @@
 
 ## Overview
 
-The PropagateRoot service is a helper component in the Linea WorldID system. Its primary function is to relay Merkle tree roots from the Ethereum L1 (mainnet) WorldID Identity Manager to the Linea L2 WorldID contract.
+The PropagateRoot service is a helper component in the Linea WorldID system. Its primary function is to relay Merkle
+tree roots from the Ethereum L1 (mainnet) WorldID Identity Manager to the Linea L2 WorldID contract.
 
 ## Main Goal
 
@@ -24,7 +25,8 @@ The service aims to:
 
 1. **Initialization**: The service validates its configuration and connects to L1 and L2 networks.
 2. **L1 Event Monitoring**: Listens for TreeChanged events on the WorldID Identity Manager contract on L1.
-3. **Root Propagation**: Upon detecting a TreeChanged event, calls `propagateRoot()` on the LineaStateBridge contract on L1.
+3. **Root Propagation**: Upon detecting a TreeChanged event, calls `propagateRoot()` on the LineaStateBridge contract on
+   L1.
 4. **L2 Message Claiming**: Periodically checks for and claims messages on the LineaWorldID contract on L2.
 5. **Continuous Operation**: Continues monitoring events and claiming messages to maintain synchronization.
 
@@ -40,6 +42,7 @@ The service aims to:
 - `LINEA_WORLD_ID_ADDRESS`: LineaWorldID contract address on L2.
 
 Optional variables (with defaults) include:
+
 - `PROPAGATION_PERIOD`: Time between root propagations (default: 1 hour).
 - `LISTENER_INIT_DELAY`: Delay before starting the L1 listener (default: 0 seconds).
 - `L1_BLOCKS_TO_QUERY`: Number of L1 blocks to query for events (default: 1000).
@@ -47,7 +50,8 @@ Optional variables (with defaults) include:
 - `L2_POLLING_INTERVAL`: Interval for polling L2 for new blocks (default: 15 seconds).
 - `LINEA_NETWORK`: Linea network name (default: "linea-mainnet").
 
-It also supports a special `ENVIRONMENT` variable to load environment-specific variables from the corresponding `.env` file.
+It also supports a special `ENVIRONMENT` variable to load environment-specific variables from the corresponding `.env`
+file.
 
 ## Security Note
 

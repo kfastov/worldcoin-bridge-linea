@@ -120,9 +120,11 @@ For instructions on how to deploy to a testnet or mainnet, check out the
 ### Run Root Propagator
 
 To run the root propagator on testnet:
+
 ```sh
 $ bun run propagator:testnet
 ```
+
 You can read more about the root propagator [here](./docs/root-propagator.md).
 
 ## Contributing
