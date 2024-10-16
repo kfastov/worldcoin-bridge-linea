@@ -165,7 +165,7 @@ export function parseJson(data) {
  * @returns {Promise<string>} - The chain ID as a string.
  */
 async function getChainId(rpcUrl) {
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
   const network = await provider.getNetwork();
   return network.chainId.toString();
 }
@@ -266,7 +266,7 @@ async function verifyLineaWorldID(config) {
     }
 
     // Now, compose the forge verify-contract command
-    let command = `forge verify-contract ${contractAddress} src/LineaWorldID.sol:${contractName} --chain ${chainId} --etherscan-api-key ${config.lineaScanApiKey}`;
+    let command = `forge verify-contract ${contractAddress} src/LineaWorldID.sol:${contractName} --etherscan-api-key ${config.lineaScanApiKey}`;
 
     if (constructorArgs && constructorArgs !== '0x') {
       command += ` --constructor-args ${constructorArgs}`;
@@ -403,9 +403,9 @@ async function deployment(config) {
       "MESSAGE_SERVICE_ADDRESS_L2",
       "Enter L2 message service address: ",
     );
-    await saveConfiguration(config);
+    saveConfiguration(config);
     await deployLineaWorldID(config);
-    await saveConfiguration(config);
+    saveConfiguration(config);
     if (config.lineaScanApiKey) {
       await verifyLineaWorldID(config);
     }
@@ -416,16 +416,16 @@ async function deployment(config) {
       "Enter WorldID Identity Manager Address: ",
     );
     await getConfigValue(config, "lineaWorldIDAddress", "LINEA_WORLD_ID_ADDRESS", "Enter Linea WorldID Address: ");
-    await saveConfiguration(config);
+    saveConfiguration(config);
     await deployLineaStateBridge(config);
-    await saveConfiguration(config);
+    saveConfiguration(config);
     await getConfigValue(
       config,
       "lineaStateBridgeAddress",
       "LINEA_STATE_BRIDGE_ADDRESS",
       "Enter Linea State Bridge Address: ",
     );
-    await saveConfiguration(config);
+    saveConfiguration(config);
     await InitializeLineaWorldID(config);
   } catch (err) {
     throw err;
@@ -457,7 +457,7 @@ async function main() {
       let config = await loadConfiguration(options.config);
 
       await deployment(config);
-      await saveConfiguration(config);
+      saveConfiguration(config);
     });
 
   await program.parseAsync();

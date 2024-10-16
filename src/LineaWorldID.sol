@@ -12,6 +12,9 @@ import { CrossDomainOwnableLinea } from "./CrossDomainOwnableLinea.sol";
 /// @dev This contract is deployed on Linea and is called by the L1 Proxy contract for each new
 ///      root insertion.
 contract LineaWorldID is WorldIDBridge, ILineaWorldID, CrossDomainOwnableLinea {
+
+    uint16 public constant ADDITION_TO_VERIFY_AGAIN = 1337;
+
     ///////////////////////////////////////////////////////////////////////////////
     ///                                CONSTRUCTION                             ///
     ///////////////////////////////////////////////////////////////////////////////

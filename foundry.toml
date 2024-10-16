@@ -45,6 +45,11 @@ gas_reports = [
 # mainnet = { key = "${API_KEY_ETHERSCAN}" }
 # sepolia = { key = "${API_KEY_ETHERSCAN}" }
 
+[etherscan.linea_sepolia]
+key = "${LINEA_SCAN_API_KEY}"
+chain = 59141
+url = "${LINEA_SCAN_VERIFIER_URL}"
+
 [fmt]
 bracket_spacing = true
 int_types = "long"
