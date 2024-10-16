@@ -185,7 +185,6 @@ async function deployLineaWorldID(config) {
 
   try {
     let command = `forge script src/script/DeployLineaWorldID.s.sol:DeployLineaWorldID --fork-url ${config.lineaRpcUrl} --broadcast --json`;
-    console.log(command);
     const output = execSync(command);
     const data = output.toString();
     const jsonData = parseJson(data);
@@ -278,8 +277,6 @@ async function verifyLineaWorldID(config) {
     }
 
     command += ` --watch`;
-
-    console.log(command);
 
     const output = execSync(command);
     console.log(output.toString());
