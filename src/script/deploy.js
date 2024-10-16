@@ -23,10 +23,10 @@ function loadEnvFile(environment) {
 /**
  * Asks the user a question and returns the answer.
  *
- * @param {string} question the question contents.
- * @param {?string} type an optional type to parse the answer as. Currently only supports 'int' for
- *        decimal integers. and `bool` for booleans.
- * @returns a promise resolving to user's response
+ * @param {string} question - The question contents.
+ * @param {?string} type - An optional type to parse the answer as. Currently supports 'int' for
+ *        decimal integers and 'bool' for booleans.
+ * @returns {Promise<any>} A promise resolving to the user's response.
  */
 function ask(question, type) {
   const rl = readline.createInterface({
@@ -41,22 +41,17 @@ function ask(question, type) {
         if (isNaN(input)) {
           reject("Invalid input");
         }
-      }
-      if (type === "bool") {
+      } else if (type === "bool") {
         if (!input) {
           input = undefined;
         } else {
-          switch (input.trim()) {
+          switch (input.trim().toLowerCase()) {
             case "y":
-            case "Y":
             case "true":
-            case "True":
               input = true;
               break;
             case "n":
-            case "N":
             case "false":
-            case "False":
               input = false;
               break;
             default:
@@ -71,124 +66,26 @@ function ask(question, type) {
   });
 }
 
-///////////////////////////////////////////////////////////////////
-///                      DEPLOYMENT CONFIG                      ///
-///////////////////////////////////////////////////////////////////
-async function getPrivateKey(config) {
-  if (!config.privateKey) {
-    config.privateKey = process.env.PRIVATE_KEY;
+/**
+ * Retrieves a configuration value, first checking the config object, then environment variables,
+ * and finally prompting the user if necessary.
+ *
+ * @param {Object} config - The configuration object to update.
+ * @param {string} key - The key to retrieve and store in the config.
+ * @param {string} envVarName - The environment variable name to check.
+ * @param {string} question - The question to ask the user if the value is not found.
+ * @param {?any} defaultValue - The default value to use if the user provides no input.
+ * @param {?string} type - The type of the expected value ('int', 'bool').
+ */
+async function getConfigValue(config, key, envVarName, question, defaultValue, type) {
+  if (!config[key]) {
+    config[key] = process.env[envVarName];
   }
-  if (!config.privateKey) {
-    config.privateKey = await ask("Enter your private key: ");
+  if (!config[key]) {
+    config[key] = await ask(question, type);
   }
-}
-
-async function getMessageServiceAddressL1(config) {
-  if (!config.messageServiceAddressL1) {
-    config.messageServiceAddressL1 = process.env.MESSAGE_SERVICE_ADDRESS_L1;
-  }
-  if (!config.messageServiceAddressL1) {
-    config.messageServiceAddressL1 = await ask("Enter L1 message service address: ");
-  }
-}
-
-async function getMessageServiceAddressL2(config) {
-  if (!config.messageServiceAddressL2) {
-    config.messageServiceAddressL2 = process.env.MESSAGE_SERVICE_ADDRESS_L2;
-  }
-  if (!config.messageServiceAddressL2) {
-    config.messageServiceAddressL2 = await ask("Enter L2 message service address: ");
-  }
-}
-
-async function getEthereumRpcUrl(config) {
-  if (!config.ethereumRpcUrl) {
-    config.ethereumRpcUrl = process.env.ETH_RPC_URL;
-  }
-  if (!config.ethereumRpcUrl) {
-    config.ethereumRpcUrl = await ask(`Enter Ethereum RPC URL: (${DEFAULT_RPC_URL}) `);
-  }
-  if (!config.ethereumRpcUrl) {
-    config.ethereumRpcUrl = DEFAULT_RPC_URL;
-  }
-}
-
-async function getLineaRpcUrl(config) {
-  if (!config.lineaRpcUrl) {
-    config.lineaRpcUrl = process.env.LINEA_RPC_URL;
-  }
-  if (!config.lineaRpcUrl) {
-    config.lineaRpcUrl = await ask(`Enter Linea RPC URL: (${DEFAULT_RPC_URL}) `);
-  }
-  if (!config.lineaRpcUrl) {
-    config.lineaRpcUrl = DEFAULT_RPC_URL;
-  }
-}
-
-async function getEtherscanApiKey(config) {
-  if (!config.etherscanApiKey) {
-    config.etherscanApiKey = process.env.ETHERSCAN_API_KEY;
-  }
-  if (!config.etherscanApiKey) {
-    config.etherscanApiKey = await ask(
-      `Enter Ethereum Etherscan API KEY: (https://etherscan.io/myaccount) (Leave it empty for mocks) `,
-    );
-  }
-}
-
-async function getLineaScanApiKey(config) {
-  if (!config.lineaScanApiKey) {
-    config.lineaScanApiKey = process.env.LINEA_SCAN_API_KEY;
-  }
-  if (!config.lineaScanApiKey) {
-    config.lineaScanApiKey = await ask(
-      `Enter Lineascan API KEY: (https://lineascan.build/myaccount) (Leave it empty for mocks) `,
-    );
-  }
-}
-
-async function getLineaScanVerifierUrl(config) {
-  if (!config.lineaScanVerifierUrl) {
-    config.lineaScanVerifierUrl = process.env.LINEA_SCAN_VERIFIER_URL;
-  }
-  if (!config.lineaScanVerifierUrl) {
-    config.lineaScanVerifierUrl = await ask("Enter Lineascan Verifier URL: ");
-  }
-}
-
-async function getTreeDepth(config) {
-  if (!config.treeDepth) {
-    config.treeDepth = await ask(`Enter WorldID tree depth: (${DEFAULT_TREE_DEPTH}) `);
-  }
-  if (!config.treeDepth) {
-    config.treeDepth = DEFAULT_TREE_DEPTH;
-  }
-}
-
-async function getLineaWorldIDAddress(config) {
-  if (!config.lineaWorldIDAddress) {
-    config.lineaWorldIDAddress = process.env.LINEA_WORLD_ID_ADDRESS;
-  }
-  if (!config.lineaWorldIDAddress) {
-    config.lineaWorldIDAddress = await ask("Enter Linea WorldID Address: ");
-  }
-}
-
-async function getLineaStateBridgeAddress(config) {
-  if (!config.lineaStateBridgeAddress) {
-    config.lineaStateBridgeAddress = process.env.LINEA_STATE_BRIDGE_ADDRESS;
-  }
-  if (!config.lineaStateBridgeAddress) {
-    config.lineaStateBridgeAddress = await ask("Enter Linea State Bridge Address: ");
-  }
-}
-
-async function getWorldIDIdentityManagerAddress(config) {
-  if (!config.worldIDIdentityManagerAddress) {
-    config.worldIDIdentityManagerAddress = process.env.WORLD_ID_IDENTITY_MANAGER_ADDRESS;
-  }
-  if (!config.worldIDIdentityManagerAddress) {
-    config.worldIDIdentityManagerAddress = await ask("Enter WorldID Identity Manager Address: ");
+  if (!config[key] && defaultValue !== undefined) {
+    config[key] = defaultValue;
   }
 }
 
@@ -232,7 +129,7 @@ async function loadConfiguration(useConfig) {
   }
 }
 
-async function saveConfiguration(config) {
+function saveConfiguration(config) {
   const oldData = (() => {
     try {
       return JSON.parse(fs.readFileSync(CONFIG_FILENAME).toString());
@@ -276,6 +173,7 @@ async function deployLineaWorldID(config) {
 
   try {
     let command = `forge script src/script/DeployLineaWorldID.s.sol:DeployLineaWorldID --fork-url ${config.lineaRpcUrl} --broadcast --json`;
+    console.log(command);
     const output = execSync(command);
     const data = output.toString();
     const jsonData = parseJson(data);
@@ -375,27 +273,76 @@ async function InitializeLineaWorldID(config) {
 async function deployment(config) {
   dotenv.config();
   try {
-    await getPrivateKey(config);
-    await getEthereumRpcUrl(config);
-    await getLineaRpcUrl(config);
-    await getEtherscanApiKey(config);
-    await getLineaScanApiKey(config);
-    await getLineaScanVerifierUrl(config);
-    await getTreeDepth(config);
-    await getMessageServiceAddressL1(config);
-    await getMessageServiceAddressL2(config);
+    await getConfigValue(config, "privateKey", "PRIVATE_KEY", "Enter your private key: ");
+    await getConfigValue(
+      config,
+      "ethereumRpcUrl",
+      "ETH_RPC_URL",
+      `Enter Ethereum RPC URL: (${DEFAULT_RPC_URL}) `,
+      DEFAULT_RPC_URL,
+    );
+    await getConfigValue(
+      config,
+      "lineaRpcUrl",
+      "LINEA_RPC_URL",
+      `Enter Linea RPC URL: (${DEFAULT_RPC_URL}) `,
+      DEFAULT_RPC_URL,
+    );
+    await getConfigValue(
+      config,
+      "etherscanApiKey",
+      "ETHERSCAN_API_KEY",
+      `Enter Ethereum Etherscan API KEY: (https://etherscan.io/myaccount) (Leave it empty for mocks) `,
+    );
+    await getConfigValue(
+      config,
+      "lineaScanApiKey",
+      "LINEA_SCAN_API_KEY",
+      `Enter Lineascan API KEY: (https://lineascan.build/myaccount) (Leave it empty for mocks) `,
+    );
+    await getConfigValue(config, "lineaScanVerifierUrl", "LINEA_SCAN_VERIFIER_URL", "Enter Lineascan Verifier URL: ");
+    await getConfigValue(
+      config,
+      "treeDepth",
+      null,
+      `Enter WorldID tree depth: (${DEFAULT_TREE_DEPTH}) `,
+      DEFAULT_TREE_DEPTH,
+      "int",
+    );
+    await getConfigValue(
+      config,
+      "messageServiceAddressL1",
+      "MESSAGE_SERVICE_ADDRESS_L1",
+      "Enter L1 message service address: ",
+    );
+    await getConfigValue(
+      config,
+      "messageServiceAddressL2",
+      "MESSAGE_SERVICE_ADDRESS_L2",
+      "Enter L2 message service address: ",
+    );
     await saveConfiguration(config);
     await deployLineaWorldID(config);
     await saveConfiguration(config);
     if (config.etherscanApiKey) {
       await verifyLineaWorldID(config);
     }
-    await getWorldIDIdentityManagerAddress(config);
-    await getLineaWorldIDAddress(config);
+    await getConfigValue(
+      config,
+      "worldIDIdentityManagerAddress",
+      "WORLD_ID_IDENTITY_MANAGER_ADDRESS",
+      "Enter WorldID Identity Manager Address: ",
+    );
+    await getConfigValue(config, "lineaWorldIDAddress", "LINEA_WORLD_ID_ADDRESS", "Enter Linea WorldID Address: ");
     await saveConfiguration(config);
     await deployLineaStateBridge(config);
     await saveConfiguration(config);
-    await getLineaStateBridgeAddress(config);
+    await getConfigValue(
+      config,
+      "lineaStateBridgeAddress",
+      "LINEA_STATE_BRIDGE_ADDRESS",
+      "Enter Linea State Bridge Address: ",
+    );
     await saveConfiguration(config);
     await InitializeLineaWorldID(config);
   } catch (err) {
@@ -425,7 +372,7 @@ async function main() {
 
       console.log("Loading environment:", environment);
       loadEnvFile(environment);
-      let config = await loadConfiguration(options.config, environment);
+      let config = await loadConfiguration(options.config);
 
       await deployment(config);
       await saveConfiguration(config);
