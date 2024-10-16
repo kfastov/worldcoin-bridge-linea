@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import ora from "ora";
 import { Command } from "commander";
 import { execSync } from "child_process";
+import { ethers } from "ethers";
 
 // === Constants ==================================================================================
 const CONFIG_FILENAME = "src/script/.deploy-config.json";
@@ -158,6 +159,17 @@ export function parseJson(data) {
   }
 }
 
+/**
+ * Gets the chain ID from the provided RPC URL.
+ * @param {string} rpcUrl - The RPC URL of the network.
+ * @returns {Promise<string>} - The chain ID as a string.
+ */
+async function getChainId(rpcUrl) {
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const network = await provider.getNetwork();
+  return network.chainId.toString();
+}
+
 ///////////////////////////////////////////////////////////////////
 ///                         DEPLOYMENTS                         ///
 ///////////////////////////////////////////////////////////////////
@@ -193,18 +205,88 @@ async function deployLineaWorldID(config) {
   }
 }
 
-// Can't verify and deploy at the same time due to https://github.com/foundry-rs/foundry/issues/7466
+// Modified verifyLineaWorldID function
 async function verifyLineaWorldID(config) {
   const spinner = ora("Verifying LineaWorldID on Linea...").start();
 
   try {
-    let command = `forge verify-contract ${config.lineaWorldIDAddress} src/LineaWorldID.sol:LineaWorldID --etherscan-api-key ${config.lineaScanApiKey} --verifier-url ${config.lineaScanVerifierUrl} --watch`;
+    // Get the chain ID
+    const chainId = await getChainId(config.lineaRpcUrl);
+
+    // Find the run-latest.json file
+    const runLatestJsonPath = path.join(
+      "broadcast",
+      "DeployLineaWorldID.s.sol",
+      chainId.toString(),
+      "run-latest.json"
+    );
+
+    if (!fs.existsSync(runLatestJsonPath)) {
+      spinner.fail(`Could not find deployment file at ${runLatestJsonPath}`);
+      return;
+    }
+
+    const runData = JSON.parse(fs.readFileSync(runLatestJsonPath, 'utf8'));
+
+    // Now, parse the runData to get the necessary info
+    // Since we know only one contract was deployed, we can get the transaction where transactionType is "CREATE"
+
+    const transactions = runData.transactions;
+    let contractAddress;
+    let contractName;
+    let constructorArgs;
+
+    for (const tx of transactions) {
+      if (tx.transactionType === "CREATE") {
+        contractAddress = tx.contractAddress;
+        contractName = tx.contractName;
+        // Get the constructor arguments from the input data
+        const deployedBytecode = tx.transaction.input; // this is the input data (bytecode + constructor args)
+        // Load the compiled bytecode
+        const compiledContractPath = path.join("out", `${contractName}.sol`, `${contractName}.json`);
+        const compiledContract = JSON.parse(fs.readFileSync(compiledContractPath, 'utf8'));
+        let compiledBytecode = compiledContract.bytecode.object;
+
+        // Remove the '0x' prefix
+        const compiledBytecodeWithout0x = compiledBytecode.startsWith('0x') ? compiledBytecode.slice(2) : compiledBytecode;
+        const deployedBytecodeWithout0x = deployedBytecode.startsWith('0x') ? deployedBytecode.slice(2) : deployedBytecode;
+
+        // The constructor args are the extra bytes in deployedBytecode after the compiled bytecode
+        const compiledBytecodeLength = compiledBytecodeWithout0x.length;
+        const constructorArgsHex = deployedBytecodeWithout0x.slice(compiledBytecodeLength);
+        constructorArgs = '0x' + constructorArgsHex;
+
+        break; // Since we only have one deployment, we can break here
+      }
+    }
+
+    if (!contractAddress || !contractName) {
+      spinner.fail("Could not find contract deployment in transactions");
+      return;
+    }
+
+    // Now, compose the forge verify-contract command
+    let command = `forge verify-contract ${contractAddress} src/LineaWorldID.sol:${contractName} --chain ${chainId} --etherscan-api-key ${config.lineaScanApiKey}`;
+
+    if (constructorArgs && constructorArgs !== '0x') {
+      command += ` --constructor-args ${constructorArgs}`;
+    }
+
+    // Optionally, add --verifier-url if necessary
+    if (config.lineaScanVerifierUrl) {
+      command += ` --verifier-url ${config.lineaScanVerifierUrl}`;
+    }
+
+    command += ` --watch`;
+
     console.log(command);
+
     const output = execSync(command);
-    console.log(output);
-    spinner.succeed("Verify LineaWorldID ran successfully!");
+    console.log(output.toString());
+    spinner.succeed("Verification command ran successfully!");
   } catch (err) {
-    spinner.fail("Verify LineaWorldID failed!");
+    spinner.fail("Verification failed!");
+    console.error(err);
   }
 }
 
@@ -324,7 +406,7 @@ async function deployment(config) {
     await saveConfiguration(config);
     await deployLineaWorldID(config);
     await saveConfiguration(config);
-    if (config.etherscanApiKey) {
+    if (config.lineaScanApiKey) {
       await verifyLineaWorldID(config);
     }
     await getConfigValue(
