@@ -204,7 +204,7 @@ async function deployLineaWorldID(config) {
   }
 }
 
-// Modified verifyLineaWorldID function
+// Can't verify and deploy at the same time due to https://github.com/foundry-rs/foundry/issues/7466
 async function verifyLineaWorldID(config) {
   const spinner = ora("Verifying LineaWorldID on Linea...").start();
 
@@ -279,7 +279,6 @@ async function verifyLineaWorldID(config) {
     command += ` --watch`;
 
     const output = execSync(command);
-    console.log(output.toString());
     spinner.succeed("Verification command ran successfully!");
   } catch (err) {
     spinner.fail("Verification failed!");
