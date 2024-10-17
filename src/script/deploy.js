@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import ora from "ora";
 import { Command } from "commander";
 import { execSync } from "child_process";
+import { ethers } from "ethers";
 
 // === Constants ==================================================================================
 const CONFIG_FILENAME = "src/script/.deploy-config.json";
@@ -23,10 +24,10 @@ function loadEnvFile(environment) {
 /**
  * Asks the user a question and returns the answer.
  *
- * @param {string} question the question contents.
- * @param {?string} type an optional type to parse the answer as. Currently only supports 'int' for
- *        decimal integers. and `bool` for booleans.
- * @returns a promise resolving to user's response
+ * @param {string} question - The question contents.
+ * @param {?string} type - An optional type to parse the answer as. Currently supports 'int' for
+ *        decimal integers and 'bool' for booleans.
+ * @returns {Promise<any>} A promise resolving to the user's response.
  */
 function ask(question, type) {
   const rl = readline.createInterface({
@@ -41,22 +42,17 @@ function ask(question, type) {
         if (isNaN(input)) {
           reject("Invalid input");
         }
-      }
-      if (type === "bool") {
+      } else if (type === "bool") {
         if (!input) {
           input = undefined;
         } else {
-          switch (input.trim()) {
+          switch (input.trim().toLowerCase()) {
             case "y":
-            case "Y":
             case "true":
-            case "True":
               input = true;
               break;
             case "n":
-            case "N":
             case "false":
-            case "False":
               input = false;
               break;
             default:
@@ -71,124 +67,26 @@ function ask(question, type) {
   });
 }
 
-///////////////////////////////////////////////////////////////////
-///                      DEPLOYMENT CONFIG                      ///
-///////////////////////////////////////////////////////////////////
-async function getPrivateKey(config) {
-  if (!config.privateKey) {
-    config.privateKey = process.env.PRIVATE_KEY;
+/**
+ * Retrieves a configuration value, first checking the config object, then environment variables,
+ * and finally prompting the user if necessary.
+ *
+ * @param {Object} config - The configuration object to update.
+ * @param {string} key - The key to retrieve and store in the config.
+ * @param {string} envVarName - The environment variable name to check.
+ * @param {string} question - The question to ask the user if the value is not found.
+ * @param {?any} defaultValue - The default value to use if the user provides no input.
+ * @param {?string} type - The type of the expected value ('int', 'bool').
+ */
+async function getConfigValue(config, key, envVarName, question, defaultValue, type) {
+  if (!config[key]) {
+    config[key] = process.env[envVarName];
   }
-  if (!config.privateKey) {
-    config.privateKey = await ask("Enter your private key: ");
+  if (!config[key]) {
+    config[key] = await ask(question, type);
   }
-}
-
-async function getMessageServiceAddressL1(config) {
-  if (!config.messageServiceAddressL1) {
-    config.messageServiceAddressL1 = process.env.MESSAGE_SERVICE_ADDRESS_L1;
-  }
-  if (!config.messageServiceAddressL1) {
-    config.messageServiceAddressL1 = await ask("Enter L1 message service address: ");
-  }
-}
-
-async function getMessageServiceAddressL2(config) {
-  if (!config.messageServiceAddressL2) {
-    config.messageServiceAddressL2 = process.env.MESSAGE_SERVICE_ADDRESS_L2;
-  }
-  if (!config.messageServiceAddressL2) {
-    config.messageServiceAddressL2 = await ask("Enter L2 message service address: ");
-  }
-}
-
-async function getEthereumRpcUrl(config) {
-  if (!config.ethereumRpcUrl) {
-    config.ethereumRpcUrl = process.env.ETH_RPC_URL;
-  }
-  if (!config.ethereumRpcUrl) {
-    config.ethereumRpcUrl = await ask(`Enter Ethereum RPC URL: (${DEFAULT_RPC_URL}) `);
-  }
-  if (!config.ethereumRpcUrl) {
-    config.ethereumRpcUrl = DEFAULT_RPC_URL;
-  }
-}
-
-async function getLineaRpcUrl(config) {
-  if (!config.lineaRpcUrl) {
-    config.lineaRpcUrl = process.env.LINEA_RPC_URL;
-  }
-  if (!config.lineaRpcUrl) {
-    config.lineaRpcUrl = await ask(`Enter Linea RPC URL: (${DEFAULT_RPC_URL}) `);
-  }
-  if (!config.lineaRpcUrl) {
-    config.lineaRpcUrl = DEFAULT_RPC_URL;
-  }
-}
-
-async function getEtherscanApiKey(config) {
-  if (!config.etherscanApiKey) {
-    config.etherscanApiKey = process.env.ETHERSCAN_API_KEY;
-  }
-  if (!config.etherscanApiKey) {
-    config.etherscanApiKey = await ask(
-      `Enter Ethereum Etherscan API KEY: (https://etherscan.io/myaccount) (Leave it empty for mocks) `,
-    );
-  }
-}
-
-async function getLineaScanApiKey(config) {
-  if (!config.lineaScanApiKey) {
-    config.lineaScanApiKey = process.env.LINEA_SCAN_API_KEY;
-  }
-  if (!config.lineaScanApiKey) {
-    config.lineaScanApiKey = await ask(
-      `Enter Lineascan API KEY: (https://lineascan.build/myaccount) (Leave it empty for mocks) `,
-    );
-  }
-}
-
-async function getLineaScanVerifierUrl(config) {
-  if (!config.lineaScanVerifierUrl) {
-    config.lineaScanVerifierUrl = process.env.LINEA_SCAN_VERIFIER_URL;
-  }
-  if (!config.lineaScanVerifierUrl) {
-    config.lineaScanVerifierUrl = await ask("Enter Lineascan Verifier URL: ");
-  }
-}
-
-async function getTreeDepth(config) {
-  if (!config.treeDepth) {
-    config.treeDepth = await ask(`Enter WorldID tree depth: (${DEFAULT_TREE_DEPTH}) `);
-  }
-  if (!config.treeDepth) {
-    config.treeDepth = DEFAULT_TREE_DEPTH;
-  }
-}
-
-async function getLineaWorldIDAddress(config) {
-  if (!config.lineaWorldIDAddress) {
-    config.lineaWorldIDAddress = process.env.LINEA_WORLD_ID_ADDRESS;
-  }
-  if (!config.lineaWorldIDAddress) {
-    config.lineaWorldIDAddress = await ask("Enter Linea WorldID Address: ");
-  }
-}
-
-async function getLineaStateBridgeAddress(config) {
-  if (!config.lineaStateBridgeAddress) {
-    config.lineaStateBridgeAddress = process.env.LINEA_STATE_BRIDGE_ADDRESS;
-  }
-  if (!config.lineaStateBridgeAddress) {
-    config.lineaStateBridgeAddress = await ask("Enter Linea State Bridge Address: ");
-  }
-}
-
-async function getWorldIDIdentityManagerAddress(config) {
-  if (!config.worldIDIdentityManagerAddress) {
-    config.worldIDIdentityManagerAddress = process.env.WORLD_ID_IDENTITY_MANAGER_ADDRESS;
-  }
-  if (!config.worldIDIdentityManagerAddress) {
-    config.worldIDIdentityManagerAddress = await ask("Enter WorldID Identity Manager Address: ");
+  if (!config[key] && defaultValue !== undefined) {
+    config[key] = defaultValue;
   }
 }
 
@@ -232,7 +130,7 @@ async function loadConfiguration(useConfig) {
   }
 }
 
-async function saveConfiguration(config) {
+function saveConfiguration(config) {
   const oldData = (() => {
     try {
       return JSON.parse(fs.readFileSync(CONFIG_FILENAME).toString());
@@ -259,6 +157,17 @@ export function parseJson(data) {
   } else {
     return {};
   }
+}
+
+/**
+ * Gets the chain ID from the provided RPC URL.
+ * @param {string} rpcUrl - The RPC URL of the network.
+ * @returns {Promise<string>} - The chain ID as a string.
+ */
+async function getChainId(rpcUrl) {
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const network = await provider.getNetwork();
+  return network.chainId.toString();
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -300,13 +209,80 @@ async function verifyLineaWorldID(config) {
   const spinner = ora("Verifying LineaWorldID on Linea...").start();
 
   try {
-    let command = `forge verify-contract ${config.lineaWorldIDAddress} src/LineaWorldID.sol:LineaWorldID --etherscan-api-key ${config.lineaScanApiKey} --verifier-url ${config.lineaScanVerifierUrl} --watch`;
-    console.log(command);
+    // Get the chain ID
+    const chainId = await getChainId(config.lineaRpcUrl);
+
+    // Find the run-latest.json file
+    const runLatestJsonPath = path.join(
+      "broadcast",
+      "DeployLineaWorldID.s.sol",
+      chainId.toString(),
+      "run-latest.json"
+    );
+
+    if (!fs.existsSync(runLatestJsonPath)) {
+      spinner.fail(`Could not find deployment file at ${runLatestJsonPath}`);
+      return;
+    }
+
+    const runData = JSON.parse(fs.readFileSync(runLatestJsonPath, 'utf8'));
+
+    // Now, parse the runData to get the necessary info
+    // Since we know only one contract was deployed, we can get the transaction where transactionType is "CREATE"
+
+    const transactions = runData.transactions;
+    let contractAddress;
+    let contractName;
+    let constructorArgs;
+
+    for (const tx of transactions) {
+      if (tx.transactionType === "CREATE") {
+        contractAddress = tx.contractAddress;
+        contractName = tx.contractName;
+        // Get the constructor arguments from the input data
+        const deployedBytecode = tx.transaction.input; // this is the input data (bytecode + constructor args)
+        // Load the compiled bytecode
+        const compiledContractPath = path.join("out", `${contractName}.sol`, `${contractName}.json`);
+        const compiledContract = JSON.parse(fs.readFileSync(compiledContractPath, 'utf8'));
+        let compiledBytecode = compiledContract.bytecode.object;
+
+        // Remove the '0x' prefix
+        const compiledBytecodeWithout0x = compiledBytecode.startsWith('0x') ? compiledBytecode.slice(2) : compiledBytecode;
+        const deployedBytecodeWithout0x = deployedBytecode.startsWith('0x') ? deployedBytecode.slice(2) : deployedBytecode;
+
+        // The constructor args are the extra bytes in deployedBytecode after the compiled bytecode
+        const compiledBytecodeLength = compiledBytecodeWithout0x.length;
+        const constructorArgsHex = deployedBytecodeWithout0x.slice(compiledBytecodeLength);
+        constructorArgs = '0x' + constructorArgsHex;
+
+        break; // Since we only have one deployment, we can break here
+      }
+    }
+
+    if (!contractAddress || !contractName) {
+      spinner.fail("Could not find contract deployment in transactions");
+      return;
+    }
+
+    // Now, compose the forge verify-contract command
+    let command = `forge verify-contract ${contractAddress} src/LineaWorldID.sol:${contractName} --chain ${chainId} --etherscan-api-key ${config.lineaScanApiKey}`;
+
+    if (constructorArgs && constructorArgs !== '0x') {
+      command += ` --constructor-args ${constructorArgs}`;
+    }
+
+    // Optionally, add --verifier-url if necessary
+    if (config.lineaScanVerifierUrl) {
+      command += ` --verifier-url ${config.lineaScanVerifierUrl}`;
+    }
+
+    command += ` --watch`;
+
     const output = execSync(command);
-    console.log(output);
-    spinner.succeed("Verify LineaWorldID ran successfully!");
+    spinner.succeed("Verification command ran successfully!");
   } catch (err) {
-    spinner.fail("Verify LineaWorldID failed!");
+    spinner.fail("Verification failed!");
+    console.error(err);
   }
 }
 
@@ -375,27 +351,76 @@ async function InitializeLineaWorldID(config) {
 async function deployment(config) {
   dotenv.config();
   try {
-    await getPrivateKey(config);
-    await getEthereumRpcUrl(config);
-    await getLineaRpcUrl(config);
-    await getEtherscanApiKey(config);
-    await getLineaScanApiKey(config);
-    await getLineaScanVerifierUrl(config);
-    await getTreeDepth(config);
-    await getMessageServiceAddressL1(config);
-    await getMessageServiceAddressL2(config);
+    await getConfigValue(config, "privateKey", "PRIVATE_KEY", "Enter your private key: ");
+    await getConfigValue(
+      config,
+      "ethereumRpcUrl",
+      "ETH_RPC_URL",
+      `Enter Ethereum RPC URL: (${DEFAULT_RPC_URL}) `,
+      DEFAULT_RPC_URL,
+    );
+    await getConfigValue(
+      config,
+      "lineaRpcUrl",
+      "LINEA_RPC_URL",
+      `Enter Linea RPC URL: (${DEFAULT_RPC_URL}) `,
+      DEFAULT_RPC_URL,
+    );
+    await getConfigValue(
+      config,
+      "etherscanApiKey",
+      "ETHERSCAN_API_KEY",
+      `Enter Ethereum Etherscan API KEY: (https://etherscan.io/myaccount) (Leave it empty for mocks) `,
+    );
+    await getConfigValue(
+      config,
+      "lineaScanApiKey",
+      "LINEA_SCAN_API_KEY",
+      `Enter Lineascan API KEY: (https://lineascan.build/myaccount) (Leave it empty for mocks) `,
+    );
+    await getConfigValue(config, "lineaScanVerifierUrl", "LINEA_SCAN_VERIFIER_URL", "Enter Lineascan Verifier URL: ");
+    await getConfigValue(
+      config,
+      "treeDepth",
+      null,
+      `Enter WorldID tree depth: (${DEFAULT_TREE_DEPTH}) `,
+      DEFAULT_TREE_DEPTH,
+      "int",
+    );
+    await getConfigValue(
+      config,
+      "messageServiceAddressL1",
+      "MESSAGE_SERVICE_ADDRESS_L1",
+      "Enter L1 message service address: ",
+    );
+    await getConfigValue(
+      config,
+      "messageServiceAddressL2",
+      "MESSAGE_SERVICE_ADDRESS_L2",
+      "Enter L2 message service address: ",
+    );
     await saveConfiguration(config);
     await deployLineaWorldID(config);
     await saveConfiguration(config);
-    if (config.etherscanApiKey) {
+    if (config.lineaScanApiKey) {
       await verifyLineaWorldID(config);
     }
-    await getWorldIDIdentityManagerAddress(config);
-    await getLineaWorldIDAddress(config);
+    await getConfigValue(
+      config,
+      "worldIDIdentityManagerAddress",
+      "WORLD_ID_IDENTITY_MANAGER_ADDRESS",
+      "Enter WorldID Identity Manager Address: ",
+    );
+    await getConfigValue(config, "lineaWorldIDAddress", "LINEA_WORLD_ID_ADDRESS", "Enter Linea WorldID Address: ");
     await saveConfiguration(config);
     await deployLineaStateBridge(config);
     await saveConfiguration(config);
-    await getLineaStateBridgeAddress(config);
+    await getConfigValue(
+      config,
+      "lineaStateBridgeAddress",
+      "LINEA_STATE_BRIDGE_ADDRESS",
+      "Enter Linea State Bridge Address: ",
+    );
     await saveConfiguration(config);
     await InitializeLineaWorldID(config);
   } catch (err) {
@@ -425,7 +450,7 @@ async function main() {
 
       console.log("Loading environment:", environment);
       loadEnvFile(environment);
-      let config = await loadConfiguration(options.config, environment);
+      let config = await loadConfiguration(options.config);
 
       await deployment(config);
       await saveConfiguration(config);
