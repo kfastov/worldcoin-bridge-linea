@@ -6,7 +6,6 @@ import dotenv from "dotenv";
 import ora from "ora";
 import { Command } from "commander";
 import { execSync } from "child_process";
-import { ethers } from "ethers";
 
 // === Constants ==================================================================================
 const CONFIG_FILENAME = "src/script/.deploy-config.json";
@@ -159,23 +158,12 @@ export function parseJson(data) {
   }
 }
 
-/**
- * Gets the chain ID from the provided RPC URL.
- * @param {string} rpcUrl - The RPC URL of the network.
- * @returns {Promise<string>} - The chain ID as a string.
- */
-async function getChainId(rpcUrl) {
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
-  const network = await provider.getNetwork();
-  return network.chainId.toString();
-}
-
 ///////////////////////////////////////////////////////////////////
 ///                         DEPLOYMENTS                         ///
 ///////////////////////////////////////////////////////////////////
 
 async function deployLineaWorldID(config) {
-  const spinner = ora("Deploying LineaWorldID on Linea...").start();
+  const spinner = ora("Deploying and verifying LineaWorldID on Linea...").start();
 
   // Check if lineaWorldIDAddress is already in the JSON config
   if (config.lineaWorldIDAddress) {
@@ -185,6 +173,9 @@ async function deployLineaWorldID(config) {
 
   try {
     let command = `forge script src/script/DeployLineaWorldID.s.sol:DeployLineaWorldID --fork-url ${config.lineaRpcUrl} --broadcast --json`;
+    if (config.lineaScanApiKey) {
+      command += ` --etherscan-api-key ${config.lineaScanApiKey} --verify`;
+    }
     const output = execSync(command);
     const data = output.toString();
     const jsonData = parseJson(data);
@@ -197,92 +188,10 @@ async function deployLineaWorldID(config) {
         config.lineaWorldIDAddress = contractAddress;
       }
     }
-    spinner.succeed(`LineaWorldID deployed successfully at ${config.lineaWorldIDAddress}`);
+    spinner.succeed(`LineaWorldID deployed and verified successfully at ${config.lineaWorldIDAddress}`);
   } catch (err) {
-    spinner.fail("Failed to deploy LineaWorldID!");
+    spinner.fail("Failed to deploy and verify LineaWorldID!");
     throw err;
-  }
-}
-
-// Can't verify and deploy at the same time due to https://github.com/foundry-rs/foundry/issues/7466
-async function verifyLineaWorldID(config) {
-  const spinner = ora("Verifying LineaWorldID on Linea...").start();
-
-  try {
-    // Get the chain ID
-    const chainId = await getChainId(config.lineaRpcUrl);
-
-    // Find the run-latest.json file
-    const runLatestJsonPath = path.join(
-      "broadcast",
-      "DeployLineaWorldID.s.sol",
-      chainId.toString(),
-      "run-latest.json"
-    );
-
-    if (!fs.existsSync(runLatestJsonPath)) {
-      spinner.fail(`Could not find deployment file at ${runLatestJsonPath}`);
-      return;
-    }
-
-    const runData = JSON.parse(fs.readFileSync(runLatestJsonPath, 'utf8'));
-
-    // Now, parse the runData to get the necessary info
-    // Since we know only one contract was deployed, we can get the transaction where transactionType is "CREATE"
-
-    const transactions = runData.transactions;
-    let contractAddress;
-    let contractName;
-    let constructorArgs;
-
-    for (const tx of transactions) {
-      if (tx.transactionType === "CREATE") {
-        contractAddress = tx.contractAddress;
-        contractName = tx.contractName;
-        // Get the constructor arguments from the input data
-        const deployedBytecode = tx.transaction.input; // this is the input data (bytecode + constructor args)
-        // Load the compiled bytecode
-        const compiledContractPath = path.join("out", `${contractName}.sol`, `${contractName}.json`);
-        const compiledContract = JSON.parse(fs.readFileSync(compiledContractPath, 'utf8'));
-        let compiledBytecode = compiledContract.bytecode.object;
-
-        // Remove the '0x' prefix
-        const compiledBytecodeWithout0x = compiledBytecode.startsWith('0x') ? compiledBytecode.slice(2) : compiledBytecode;
-        const deployedBytecodeWithout0x = deployedBytecode.startsWith('0x') ? deployedBytecode.slice(2) : deployedBytecode;
-
-        // The constructor args are the extra bytes in deployedBytecode after the compiled bytecode
-        const compiledBytecodeLength = compiledBytecodeWithout0x.length;
-        const constructorArgsHex = deployedBytecodeWithout0x.slice(compiledBytecodeLength);
-        constructorArgs = '0x' + constructorArgsHex;
-
-        break; // Since we only have one deployment, we can break here
-      }
-    }
-
-    if (!contractAddress || !contractName) {
-      spinner.fail("Could not find contract deployment in transactions");
-      return;
-    }
-
-    // Now, compose the forge verify-contract command
-    let command = `forge verify-contract ${contractAddress} src/LineaWorldID.sol:${contractName} --chain ${chainId} --etherscan-api-key ${config.lineaScanApiKey}`;
-
-    if (constructorArgs && constructorArgs !== '0x') {
-      command += ` --constructor-args ${constructorArgs}`;
-    }
-
-    // Optionally, add --verifier-url if necessary
-    if (config.lineaScanVerifierUrl) {
-      command += ` --verifier-url ${config.lineaScanVerifierUrl}`;
-    }
-
-    command += ` --watch`;
-
-    const output = execSync(command);
-    spinner.succeed("Verification command ran successfully!");
-  } catch (err) {
-    spinner.fail("Verification failed!");
-    console.error(err);
   }
 }
 
@@ -402,9 +311,6 @@ async function deployment(config) {
     await saveConfiguration(config);
     await deployLineaWorldID(config);
     await saveConfiguration(config);
-    if (config.lineaScanApiKey) {
-      await verifyLineaWorldID(config);
-    }
     await getConfigValue(
       config,
       "worldIDIdentityManagerAddress",
